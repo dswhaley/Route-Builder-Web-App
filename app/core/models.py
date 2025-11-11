@@ -1,6 +1,6 @@
 from enum import Enum
 from typing import Any, Sequence, Tuple, List
-from datetime import date
+from datetime import date, datetime
 
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from marshmallow_sqlalchemy.fields import Nested
@@ -13,17 +13,23 @@ from app.auth.models import User, UserSchema
 ################################################################################
 
 # define Model for Banks table
-class Bank(db.Model):
-    __tablename__ = 'Banks'
-    code:     Mapped[str] = mapped_column(primary_key=True)
-    name:     Mapped[str] = mapped_column(nullable=False)
-    address:  Mapped[str] = mapped_column(nullable=False)
-    accounts:   Mapped[List['Account']] = relationship(viewonly=True)
-    def __str__(self):
-        return f"Bank(name={self.name}, code={self.code})"
-    def __repr__(self):
-        return f"Bank({self.code})"
+from enum import Enum
 
+class Type(Enum):
+    RUN = "Run"
+    RIDE = "Ride"
+
+class Activity(db.Model):
+    __tablename__ = 'Activity'
+    aid:                Mapped[int] = mapped_column(primary_key=True)
+    user_id:            Mapped[int] = mapped_column(db.ForeignKey(User.uid), nullable=False)
+    route:              Mapped[int] = mapped_column(db.ForeignKey(Route.rid), nullable=True)
+    title:              Mapped[str] = mapped_column(nullable=False)
+    description:        Mapped[str] = mapped_column(nullable=True)
+    start_time:         Mapped[datetime] = mapped_column(nullable=False)
+    type:               Mapped[Type] = mapped_column(nullable=False)
+    duration_seconds:   Mapped[int] = mapped_column(nullable=False)
+    
 # define Model for Customers table
 class Customer(db.Model):
     __tablename__ = 'Customers'
