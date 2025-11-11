@@ -39,43 +39,17 @@ class Route(db.Model):
     distance: Mapped[float] = mapped_column(nullable=False)
     elevation: Mapped[float] = mapped_column(nullable=False)
     route_name: Mapped[str] = mapped_column(nullable=False)
-    
+
     #Storing images in a database is not a good idea as they take up a lot of space.
     #Instead image_name stores the id of the route, and the image will be saved in route_images.
     #That way when the image is needed it can be fetched from that directory by that name. 
     image_name: Mapped[int] = mapped_column(nullable=False)
 
-
-
-# define Model for Customers table
-class Customer(db.Model):
-    __tablename__ = 'Customers'
-    c_number:   Mapped[int] = mapped_column(primary_key=True)
-    name:       Mapped[str] = mapped_column(nullable=False)
-    phone:      Mapped[str] = mapped_column(nullable=False)
-    email:      Mapped[str] = mapped_column(nullable=False)
-    address:    Mapped[str] = mapped_column(nullable=False)
-    membership: Mapped[str] = mapped_column(nullable=True)
-    accounts:   Mapped[List['Account']] = relationship(viewonly=True)
-    def __str__(self):
-        return f"Customer(name={self.name}, id={self.c_number})"
-    def __repr__(self):
-        return f"Customer({self.c_number})"
-
-# define Model for Accounts table
-class Account(db.Model):
-    __tablename__ = 'Accounts'
-    customer_no: Mapped[int]   = mapped_column(db.ForeignKey('Customers.c_number'))
-    code:        Mapped[str]   = mapped_column(db.ForeignKey('Banks.code'))
-    account_no:  Mapped[int]   = mapped_column(primary_key=True)
-    startdate:   Mapped[date]  = mapped_column(nullable=False)
-    balance:     Mapped[float] = mapped_column(nullable=False)
-    customer:    Mapped['Customer'] = relationship()
-    bank:        Mapped['Bank'] = relationship()
-    def __str__(self):
-        return f"Customer(customer={self.customer.name}, bank={self.bank.name})"
-    def __repr__(self):
-        return f"Account({self.account_no})"
+class UserRoutes(db.Model):
+    __tablename__ = "UserRoutes"
+    urid: Mapped[int] = mapped_column(primary_key=True)
+    rid: Mapped[int] = mapped_column(db.ForeignKey('Route.rid'))
+    uid: Mapped[int] = mapped_column(db.ForeignKey('User.uid'))
 
 ################################################################################
 # JSON Schemas for Core Database Models
