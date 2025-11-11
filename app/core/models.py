@@ -32,6 +32,21 @@ class Activity(db.Model):
     user:               Mapped['User'] = relationship()
     route:               Mapped['Route'] = relationship()
 
+
+class Route(db.Model):
+    __tablename__ = 'Route'
+    rid: Mapped[int] = mapped_column(primary_key=True)
+    distance: Mapped[float] = mapped_column(nullable=False)
+    elevation: Mapped[float] = mapped_column(nullable=False)
+    route_name: Mapped[str] = mapped_column(nullable=False)
+    
+    #Storing images in a database is not a good idea as they take up a lot of space.
+    #Instead image_name stores the id of the route, and the image will be saved in route_images.
+    #That way when the image is needed it can be fetched from that directory by that name. 
+    image_name: Mapped[int] = mapped_column(nullable=False)
+
+
+
 # define Model for Customers table
 class Customer(db.Model):
     __tablename__ = 'Customers'
