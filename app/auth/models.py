@@ -5,12 +5,16 @@ from sqlalchemy.orm import Mapped, mapped_column
 from cryptography.fernet import Fernet
 from passlib.hash import argon2
 from app import db, ma
+from datetime import date
 
 class User(UserMixin, db.Model):
     __tablename__ = "Users"
-    id:    Mapped[int] = mapped_column(primary_key=True)
+    uid:    Mapped[int] = mapped_column(primary_key=True)
     email: Mapped[str] = mapped_column(nullable=False)
     password_hash: Mapped[bytes] = mapped_column(nullable=False)
+    dob:    Mapped[date] = mapped_column(nullable=False)
+    admin: Mapped[bool] = mapped_column(nullable=False)
+    username: Mapped[str] = mapped_column(nullable=False)
 
     @property
     def pepper(self) -> Fernet:
