@@ -22,14 +22,16 @@ class Type(Enum):
 class Activity(db.Model):
     __tablename__ = 'Activity'
     aid:                Mapped[int] = mapped_column(primary_key=True)
-    user_id:            Mapped[int] = mapped_column(db.ForeignKey(User.uid), nullable=False)
-    route:              Mapped[int] = mapped_column(db.ForeignKey(Route.rid), nullable=True)
+    user_id:            Mapped[int] = mapped_column(db.ForeignKey('User.uid'), nullable=False)
+    route_id:           Mapped[int] = mapped_column(db.ForeignKey('Route.rid'), nullable=True)
     title:              Mapped[str] = mapped_column(nullable=False)
     description:        Mapped[str] = mapped_column(nullable=True)
     start_time:         Mapped[datetime] = mapped_column(nullable=False)
     type:               Mapped[Type] = mapped_column(nullable=False)
     duration_seconds:   Mapped[int] = mapped_column(nullable=False)
-    
+    user:               Mapped['User'] = relationship()
+    route:               Mapped['Route'] = relationship()
+
 # define Model for Customers table
 class Customer(db.Model):
     __tablename__ = 'Customers'
