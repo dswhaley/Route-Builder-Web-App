@@ -69,7 +69,7 @@ def init_app_db():
     # create a testing account at app launch
     example_user = User(
         email="huckfinn@example.com",               # type: ignore[call-arg]
-        password_hash='reallygoodpassword',         # type: ignore[call-arg]
+        password_hash=b'reallygoodpassword',         # type: ignore[call-arg]
         dob=date(2004, 12, 16),                     # type: ignore[call-arg]
         admin=False,                                # type: ignore[call-arg]
         username="huckfinn")                        # type: ignore[call-arg]
