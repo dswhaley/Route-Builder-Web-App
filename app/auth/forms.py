@@ -15,14 +15,14 @@ class SignUpForm(FlaskForm):
     username: StringField = StringField(
         'Username', 
         validators=[
-            DataRequired(message="Please enter a username."),
+            InputRequired(message="Please enter a username."),
             Length(min=3, max=20, message="Username must be between 3 and 20 characters.")
         ]
     )
     dob: DateField = DateField(
         'Date of Birth',
         format='%Y-%m-%d',
-        validators=[DataRequired(message="Please enter your date of birth.")]
+        validators=[InputRequired(message="Please enter your date of birth.")]
     )
     email: EmailField = EmailField('Email',
         validators=[InputRequired(), Email()])

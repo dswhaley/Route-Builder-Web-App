@@ -28,7 +28,7 @@ class Activity(db.Model):
     description:        Mapped[str] = mapped_column(nullable=True)
     start_time:         Mapped[datetime] = mapped_column(nullable=False)
     type:               Mapped[Type] = mapped_column(nullable=False)
-    duration_seconds:   Mapped[int] = mapped_column(nullable=False)
+    duration_minute:   Mapped[int] = mapped_column(nullable=False)
     user:               Mapped['User'] = relationship()
     route:               Mapped['Route'] = relationship()
 
