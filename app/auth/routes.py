@@ -6,12 +6,18 @@ from flask_login import login_user, logout_user, login_required, current_user
 from app import db
 from app.auth import bp
 from app.auth.models import User
-from app.auth.forms import LoginForm
+from app.auth.forms import LoginForm, SignUpForm
 
 @bp.get('/login/')
 def get_login():
     form: LoginForm = LoginForm()
     return render_template('login.html', form=form)
+
+
+@bp.get("/signup/")
+def sign_up():
+    form = SignUpForm()
+    return render_template("signup.html", form = form)
 
 @bp.post('/login/')
 def post_login():

@@ -1,1 +1,4 @@
-body {background-color: rgba(81, 120, 81, 0.653);}
+body {background-color: rgba(81, 120, 81);}
+#formSubmissions{font-family: 'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif; text-align: center; text-justify: initial;}
+#h{font-family: 'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif; text-align: center; font-size: 300%;}
+#buttons{width: 50%; text-align: center;}

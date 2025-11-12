@@ -1,7 +1,7 @@
 :root {
-    --color-theme-main: rgb(190, 10, 10);
-    --color-theme-dark: rgb(120, 5, 5);
-    --color-theme-light: rgb(255, 235, 235);
+    --color-theme-main: rgb(81, 120, 81);
+    --color-theme-dark: rgb(9, 1, 103);
+    --color-theme-light: rgb(185, 225, 238);
 
     --title-bar-x-padding: 2rem;
     --title-bar-height: 3rem;
