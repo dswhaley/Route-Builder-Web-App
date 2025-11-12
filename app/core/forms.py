@@ -1,7 +1,11 @@
 from enum import Enum
 
 from flask_wtf import FlaskForm
-from wtforms import Form, Field, ValidationError
+from wtforms import Form, Field, ValidationError, StringField, DateTimeLocalField, SelectField, SubmitField, IntegerField
+from wtforms.validators import InputRequired, Length, NumberRange
+from datetime import datetime
+from core.models import Type
+
 
 ################################################################################
 # Custom Form Validators
@@ -43,4 +47,31 @@ class CheckEnum():
 # Forms
 ################################################################################
 
-# TODO: create any forms needed for the core application here
+class ActivityForm(FlaskForm):
+    title: StringField = StringField(
+        'Activity Title',
+        validators=[
+            InputRequired(message="Please enter a title for the activity."),
+            Length(min=1, max=100, message="Title must be between 1 and 100 characters.")
+        ]
+    )
+    type: SelectField = SelectField(
+        'Activity Type',
+        choices=[(t.name, t.value) for t in Type],
+        validators=[InputRequired(message="Please select an activity type.")]
+    )
+    start_time: DateTimeLocalField = DateTimeLocalField(
+        'Start Time',
+        format='%Y-%m-%dT%H:%M',  
+        validators=[InputRequired(message="Please provide a start time.")],
+        default=datetime.now()  # type: ignore[arg-type]
+    )
+    duration_minutes: IntegerField = IntegerField(
+        'Duration (minutes)',
+        validators=[
+            InputRequired(message="Please enter the duration in minutes."),
+            NumberRange(min=1, max = 1440, message="Duration must be between 1 and 1440 minutes")
+        ]
+    )
+
+    submit = SubmitField("Create Avtivity")
