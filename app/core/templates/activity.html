@@ -11,11 +11,34 @@
 </head>
 <body>
 <!-- Outline for activity page -->
-
+<header>Activity</header>
 <div id="album" class="container">
 <div class="row align-items-center justify-content-left">
 <form method = POST>
-    {# forms #}
+    {{ form.hidden_tag() }}
+
+    {{form.title.label}}
+    {{form.title}}
+    <br>
+    {{form.type.label}}
+    {{form.type}}
+    <br>
+    {{form.startTime.label}}
+    {{form.startTime}}
+    <br>
+    {{form.duration.label}}
+    {{form.duration}}
+    <br>
+    {{form.route.label}}
+    {{form.route}}
+    <br>
+    {{form.distance.label}}
+    {{form.distance}}
+    <br>
+    {{form.speed.label}}
+    {{form.speed}}
+    <br>
+    {{form.submit()}}
 </form>
 </div>
 </div>
