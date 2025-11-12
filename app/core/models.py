@@ -22,7 +22,7 @@ class Type(Enum):
 class Activity(db.Model):
     __tablename__ = 'Activity'
     aid:                Mapped[int] = mapped_column(primary_key=True)
-    user_id:            Mapped[int] = mapped_column(db.ForeignKey('User.uid'), nullable=False)
+    user_id:            Mapped[int] = mapped_column(db.ForeignKey('Users.uid'), nullable=False)
     route_id:           Mapped[int] = mapped_column(db.ForeignKey('Route.rid'), nullable=True)
     title:              Mapped[str] = mapped_column(nullable=False)
     description:        Mapped[str] = mapped_column(nullable=True)
@@ -49,7 +49,7 @@ class UserRoutes(db.Model):
     __tablename__ = "UserRoutes"
     urid: Mapped[int] = mapped_column(primary_key=True)
     rid: Mapped[int] = mapped_column(db.ForeignKey('Route.rid'))
-    uid: Mapped[int] = mapped_column(db.ForeignKey('User.uid'))
+    uid: Mapped[int] = mapped_column(db.ForeignKey('Users.uid'))
 
 ################################################################################
 # JSON Schemas for Core Database Models
