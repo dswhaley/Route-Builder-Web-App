@@ -4,7 +4,7 @@ from flask_wtf import FlaskForm
 from wtforms import Form, Field, ValidationError, StringField, DateTimeLocalField, SelectField, SubmitField, IntegerField
 from wtforms.validators import InputRequired, Length, NumberRange
 from datetime import datetime
-from core.models import Type
+from app.core.models import Type
 
 
 ################################################################################
