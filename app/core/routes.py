@@ -11,7 +11,7 @@ from app.core.models import Activity
 
 @bp.get("/")
 def index():
-    form = ActivityForm
+    form = ActivityForm()
     return render_template("activity.html", form = form)
 
 # @bp.get('/')
