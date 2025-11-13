@@ -2,14 +2,19 @@ from enum import Enum
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy.orm import Mapped, mapped_column
 from sqlalchemy.sql.expression import asc, desc
-from models import Activity, User, Route, UserRoutes
+from .models import Activity, Route, UserRoutes
+from app.auth.models import User
 from typing import Sequence, Tuple
 from sqlalchemy import Row, Result, Select, func
 from app import db
+from sqlalchemy import desc
 
 
-def get_all_activities():
-    query: Select[Tuple[Activity]] = db.select(Activity)
+def get_activities_by_date():
+    query: Select[Tuple[Activity]] = (
+        db.select(Activity)
+        .filterBy(desc(Activity.start_time))
+        )
     rows: Sequence[Row[Tuple[Activity]]] = db.session.execute(query).all()
     activities: list[Activity] = [row[0] for row in rows]
 
@@ -40,7 +45,7 @@ def get_route(id):
     return row[0]
 
 def get_user(id):
-    query: Select[Tuple[User]] = db.select(User).where(User.uid == id)
+    query: Select[Tuple[User]] = db.select(User).where(User.id == id)
     row: Sequence[Row[Tuple[User]]] = db.session.execute(query).all()
     return row[0]
 
