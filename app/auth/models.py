@@ -9,7 +9,7 @@ from datetime import date
 
 class User(UserMixin, db.Model):
     __tablename__ = "Users"
-    uid:    Mapped[int] = mapped_column(primary_key=True)
+    id:    Mapped[int] = mapped_column(primary_key=True)
     email: Mapped[str] = mapped_column(nullable=False, unique=True)
     password_hash: Mapped[bytes] = mapped_column(nullable=False)
     dob:    Mapped[date] = mapped_column(nullable=False)
