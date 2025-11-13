@@ -10,10 +10,18 @@ from app import db
 from sqlalchemy import desc
 
 
+
+def get_activity_by_id(aid):
+    query: Select[Tuple[Activity]] = (
+        db.select(Activity)
+        .where(Activity.aid == aid)
+        )
+    rows = db.session.execute(query).all()
+    return rows[0][0]
 def get_activities_by_date():
     query: Select[Tuple[Activity]] = (
         db.select(Activity)
-        .filterBy(desc(Activity.start_time))
+        .order_by(desc(Activity.start_time))
         )
     rows: Sequence[Row[Tuple[Activity]]] = db.session.execute(query).all()
     activities: list[Activity] = [row[0] for row in rows]
@@ -42,10 +50,10 @@ def get_users_routes(id):
 def get_route(id):
     query: Select[Tuple[Route]] = db.select(Route).where(Route.rid == id)
     row: Sequence[Row[Tuple[Route]]] = db.session.execute(query).all()
-    return row[0]
+    return row[0][0]
 
 def get_user(id):
     query: Select[Tuple[User]] = db.select(User).where(User.id == id)
     row: Sequence[Row[Tuple[User]]] = db.session.execute(query).all()
-    return row[0]
+    return row[0][0]
 
