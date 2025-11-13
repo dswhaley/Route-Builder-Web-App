@@ -14,7 +14,9 @@ def index():
     form = ActivityForm()
     return render_template("activity.html", form = form)
 
-
+@bp.get("/home/")
+def go_home():
+    return render_template("home.html")
 # @bp.get('/')
 # @login_required
 # def index():
