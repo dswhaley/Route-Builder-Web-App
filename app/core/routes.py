@@ -24,13 +24,17 @@ def get_activities(id):
     return render_template("activities.html", activites=activities)
 
 
+# @bp.get("/home/")
+# @login_required
+# def get_home():
+#     home_activities = get_activities_by_date()
+#     return render_template("home.html", activities=home_activities)
+
+
+
 @bp.get("/home/")
-@login_required
-def get_home():
-    home_activities = get_activities_by_date()
-    return render_template("home.html", activities=home_activities)
-
-
+def go_home():
+    return render_template("home.html")
 # @bp.get('/')
 # @login_required
 # def index():
