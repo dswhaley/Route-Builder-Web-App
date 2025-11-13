@@ -69,7 +69,7 @@ def init_app_db():
     users = [
         User(email="test1@example.com", username="user1", dob=date(2001, 1, 1), admin=False), # type: ignore[call-arg]
         User(email="test2@example.com", username="user2", dob=date(2002, 2, 2), admin=False), # type: ignore[call-arg]
-        User(email="test3@example.com", username="user3", dob=date(2003, 3, 3), admin=False), # type: ignore[call-arg]
+        User(email="test3@example.com", username="user3", dob=date(2003, 3, 3), admin=True), # type: ignore[call-arg]
     ] 
     users[0].password = "password"
     users[1].password = "password"
@@ -80,9 +80,9 @@ def init_app_db():
 
     # --- ROUTES ---
     routes = [
-        Route(route_name="Route 1", distance=5.0, elevation=10, image_name="route1.jpg"),   # type: ignore[call-arg]
-        Route(route_name="Route 2", distance=10.0, elevation=50, image_name="route2.jpg"),  # type: ignore[call-arg]
-        Route(route_name="Route 3", distance=15.0, elevation=100, image_name="route3.jpg"), # type: ignore[call-arg]
+        Route(route_name="Route 1", distance=5.0, elevation=10, image_name="1.png"),   # type: ignore[call-arg]
+        Route(route_name="Route 2", distance=10.0, elevation=50, image_name="2.png"),  # type: ignore[call-arg]
+        Route(route_name="Route 3", distance=15.0, elevation=100, image_name="3.png"), # type: ignore[call-arg]
     ]
     db.session.add_all(routes)
     db.session.commit()
@@ -95,6 +95,10 @@ def init_app_db():
                  start_time=datetime(2025, 11, 11, 9, 0), type=Type.RIDE, duration_minute=45), # type: ignore[call-arg]
         Activity(user_id=3, route_id=3, title="Run 2", description="another test", # type: ignore[call-arg]
                  start_time=datetime(2025, 11, 12, 7, 0), type=Type.RUN, duration_minute=20), # type: ignore[call-arg]
+        Activity(user_id=2, title="Run 3", description="another test", # type: ignore[call-arg]
+                 start_time=datetime(2025, 11, 5, 7, 0), type=Type.RUN, duration_minute=20), # type: ignore[call-arg]
+        
     ]
+    
     db.session.add_all(activities)
     db.session.commit()
