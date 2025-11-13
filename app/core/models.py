@@ -8,7 +8,7 @@ from marshmallow_sqlalchemy.fields import Nested
 from app import db, ma
 from app.auth.models import User, UserSchema
 
-################################################################################
+############################### #################################################
 # Core Database Model Classes
 ################################################################################
 
@@ -22,7 +22,7 @@ class Type(Enum):
 class Activity(db.Model):
     __tablename__ = 'Activity'
     aid:                Mapped[int] = mapped_column(primary_key=True)
-    user_id:            Mapped[int] = mapped_column(db.ForeignKey('Users.uid'), nullable=False)
+    user_id:            Mapped[int] = mapped_column(db.ForeignKey('Users.id'), nullable=False)
     route_id:           Mapped[int] = mapped_column(db.ForeignKey('Route.rid'), nullable=True)
     title:              Mapped[str] = mapped_column(nullable=False)
     description:        Mapped[str] = mapped_column(nullable=True)
@@ -49,7 +49,7 @@ class UserRoutes(db.Model):
     __tablename__ = "UserRoutes"
     urid: Mapped[int] = mapped_column(primary_key=True)
     rid: Mapped[int] = mapped_column(db.ForeignKey('Route.rid'))
-    uid: Mapped[int] = mapped_column(db.ForeignKey('Users.uid'))
+    uid: Mapped[int] = mapped_column(db.ForeignKey('Users.id'))
 
 ################################################################################
 # JSON Schemas for Core Database Models
@@ -62,23 +62,39 @@ class UserRoutes(db.Model):
 ################################################################################
 
 def init_app_db():
-    """Initialize database tables and add any default entries"""
-    # completely drop all tables and re-create them from schemas
     db.drop_all()
     db.create_all()
-    # create a testing account at app launch
-    example_user = User(
-        email="huckfinn@example.com",               # type: ignore[call-arg]
-        password_hash=b'reallygoodpassword',         # type: ignore[call-arg]
-        dob=date(2004, 12, 16),                     # type: ignore[call-arg]
-        admin=False,                                # type: ignore[call-arg]
-        username="huckfinn")                        # type: ignore[call-arg]
-    db.session.add(example_user)                
+
+    # --- USERS ---
+    users = [
+        User(email="test1@example.com", username="user1", dob=date(2001, 1, 1), admin=False), # type: ignore[call-arg]
+        User(email="test2@example.com", username="user2", dob=date(2002, 2, 2), admin=False), # type: ignore[call-arg]
+        User(email="test3@example.com", username="user3", dob=date(2003, 3, 3), admin=False), # type: ignore[call-arg]
+    ] 
+    users[0].password = "password"
+    users[1].password = "password"
+    users[2].password = "password"
+
+    db.session.add_all(users)
     db.session.commit()
 
-    user = User.query.filter_by(email="huckfinn@example.com").first()
+    # --- ROUTES ---
+    routes = [
+        Route(route_name="Route 1", distance=5.0, elevation=10, image_name="route1.jpg"),   # type: ignore[call-arg]
+        Route(route_name="Route 2", distance=10.0, elevation=50, image_name="route2.jpg"),  # type: ignore[call-arg]
+        Route(route_name="Route 3", distance=15.0, elevation=100, image_name="route3.jpg"), # type: ignore[call-arg]
+    ]
+    db.session.add_all(routes)
+    db.session.commit()
 
-    if user:
-        print("✅ User found:", user.username)
-    else:
-        print("❌ No user with that email.")
+    # --- ACTIVITIES ---
+    activities = [
+        Activity(user_id=1, route_id=1, title="Run 1", description="test run", # type: ignore[call-arg]
+                 start_time=datetime(2025, 11, 10, 8, 0), type=Type.RUN, duration_minute=30), # type: ignore[call-arg]
+        Activity(user_id=2, route_id=2, title="Ride 1", description="just testing", # type: ignore[call-arg]
+                 start_time=datetime(2025, 11, 11, 9, 0), type=Type.RIDE, duration_minute=45), # type: ignore[call-arg]
+        Activity(user_id=3, route_id=3, title="Run 2", description="another test", # type: ignore[call-arg]
+                 start_time=datetime(2025, 11, 12, 7, 0), type=Type.RUN, duration_minute=20), # type: ignore[call-arg]
+    ]
+    db.session.add_all(activities)
+    db.session.commit()
