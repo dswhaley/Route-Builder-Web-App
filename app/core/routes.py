@@ -9,10 +9,26 @@ from app.core.forms import ActivityForm
 from app.auth.models import User
 from app.core.models import Activity
 
+from .getFromDB import get_activities_by_date, get_user_activity, get_users_routes, get_route, get_user
+
 @bp.get("/")
+@login_required
 def index():
     form = ActivityForm()
     return render_template("activity.html", form = form)
+
+@bp.get("/my_activities/<int:id>/")
+@login_required
+def get_activities(id):
+    activities = get_user_activity(id)
+    return render_template("activities.html", activites=activities)
+
+
+@bp.get("/home/")
+@login_required
+def get_home():
+    home_activities = get_activities_by_date()
+    return render_template("home.html", activities=home_activities)
 
 
 # @bp.get('/')
