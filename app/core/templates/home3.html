@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="{{ url_for('static', filename='scripts/homepage_manager.js') }}" defer></script>
+    <title>Document</title>
+</head>
+<body>
+    {%for activity in activities%}
+    <div class="activity" id="activity-{{activity.aid}}">
+        <h3>{{activity.title}}</h3>
+        <p><strong>User:</strong>{{activity.user.username}}</p>
+        <p><strong>Type:</strong> {{activity.type}}</p>
+        <p><strong>Start Time:</strong> {{activity.start_time}}</p>
+        <p><strong>Duration:</strong> {{activity.duration_minute}}</p>
+        <p><strong>Description</strong>:</strong> {{activity.description}}</p>
+        {%if activity.route%}
+            <p><strong>Route:</strong>{{activity.route.route_name}}
+            <img src="{{ url_for('static', filename='route_images/' ~ activity.route.image_name) }}" alt="Route-Map" class="route-img">
+        {%endif%}
+    <button onclick="deleteActivity('{{activity.aid}}')">Delete Activity</button>
+    {%endfor%}
+</body>
+</html>
