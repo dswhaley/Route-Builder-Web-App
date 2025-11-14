@@ -10,7 +10,13 @@ from app.core.forms import ActivityForm
 from app.auth.models import User
 from app.core.models import Activity
 
+import os
+from dotenv import load_dotenv
+
 from .getFromDB import get_activities_by_date, get_user_activity, get_users_routes, get_route, get_user
+
+
+load_dotenv()
 
 @bp.get("/create_activity")
 @login_required
@@ -69,7 +75,8 @@ def go_home():
 
 @bp.route("/create_route/")
 def create_route():
-    return render_template('create_route.html')
+    google_key = os.getenv("GOOGLE_MAPS_API_KEY")
+    return render_template('create_route.html', GOOGLE_MAPS_API_KEY=google_key)
 
 # @bp.get('/accounts/')
 # @login_required
