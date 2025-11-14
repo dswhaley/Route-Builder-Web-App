@@ -7,6 +7,7 @@ from app import db
 from app.auth import bp
 from app.auth.models import User
 from app.auth.forms import LoginForm, SignUpForm
+from app.auth.getFromDB import get_user_by_email, get_user_by_username
 
 @bp.get('/login/')
 def get_login():
@@ -15,9 +16,51 @@ def get_login():
 
 
 @bp.get("/signup/")
-def sign_up():
+def get_sign_up():
     form = SignUpForm()
     return render_template("signup.html", form = form)
+
+
+@bp.post("/signup/")
+def post_sign_up():
+    form = SignUpForm()
+    if form.validate():
+        print("VALIDATED")
+        # check if there is already a user with this email address
+        userEmail = get_user_by_email(form.email.data)
+        print(f"User email {userEmail}")
+        userName = get_user_by_username(form.username.data)
+        print(f"User name {userName}")
+
+        if userEmail is not None:
+            flash('There is already an account with that email address')
+            return redirect(url_for('auth.get_sign_up'))
+
+        if userName is not None:
+            flash('There is already an account with that username')
+            return redirect(url_for('auth.get_sign_up'))
+
+            
+        email = form.email.data
+        username = form.username.data
+        dob = form.dob.data
+
+        admin = form.admin.data
+
+        user = User(username=username, dob=dob, email=form.email.data, password=form.password.data, admin=admin ) # type:ignore
+        db.session.add(user)
+        db.session.commit()
+
+        return redirect("/")
+
+    else: # if the form was invalid
+        print("We GOT HERE")
+        # flash error messages and redirecst to get registration form again
+        for field, error in form.errors.items():
+            flash(f"{field}: {error}")
+        return redirect(url_for('auth.get_sign_up'))
+
+
 
 @bp.post('/login/')
 def post_login():
