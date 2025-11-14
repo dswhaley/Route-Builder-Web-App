@@ -2,6 +2,7 @@ from typing import Sequence, Tuple
 from sqlalchemy import Row, Select
 from flask import  render_template, redirect, url_for, current_app
 from flask_login import login_required, current_user
+from flask import redirect, url_for, render_template, flash
 
 from app import db
 from app.core import bp
@@ -17,9 +18,9 @@ from .getFromDB import get_activities_by_date, get_user_activity, get_users_rout
 
 load_dotenv()
 
-@bp.get("/")
+@bp.get("/create_activity")
 @login_required
-def index():
+def add_activity_form():
     form = ActivityForm()
     return render_template("activity.html", form = form)
 
@@ -37,7 +38,33 @@ def get_home():
     return render_template("home3.html", activities=home_activities)
 
 
+@bp.post("/create_activity/")
+@login_required
+def add_activity():
+    form = ActivityForm()
 
+    if form.validate():
+        title = form.title.data
+        type = form.type.data
+        start_time = form.start_time.data
+        duration_minutes = form.duration_minutes.data
+
+        activity = Activity(user_id=current_user.id, title=title, type=type, start_time=start_time, duration_minute=duration_minutes) # type: ignore[call-arg]
+        db.session.add(activity)
+        db.session.commit()
+
+        for i in get_activities_by_date():
+            print(f"{i.title}: By User: {i.user.username} for {i.duration_minute} mins")
+    else:
+        for field,error_msg in form.errors.items():
+            flash(f"{field}: {error_msg}")
+            return redirect(url_for('add_activity_form'))
+
+    return redirect(url_for('core.go_home'))
+
+
+
+@bp.get("/")
 @bp.get("/home/")
 def go_home():
     return render_template("home.html")
