@@ -1,0 +1,15 @@
+{
+    "compilerOptions": {
+      "module": "ES2022",
+      "target": "ES2022",
+      "noImplicitAny": true,
+      "removeComments": true,
+      "preserveConstEnums": true,
+      "sourceMap": false,
+      "types": ["google.maps"]   // loads Google Maps types
+    },
+    "compileOnSave": true,
+    "include": [
+      "static/scripts/*.ts"
+    ]
+}

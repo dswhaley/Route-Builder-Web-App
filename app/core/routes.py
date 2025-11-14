@@ -67,6 +67,10 @@ def go_home():
 # def index():
 #     return redirect(url_for('core.get_accounts'))
 
+@bp.route("/create_route/")
+def create_route():
+    return render_template('create_route.html')
+
 # @bp.get('/accounts/')
 # @login_required
 # def get_accounts():

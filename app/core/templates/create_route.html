@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Running Route Planner</title>
+<script
+    src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDheUuFPR7m0nE4M9kd63HwgbXUMU_v1Bc&libraries=maps,marker"
+    defer
+></script>
+</head>
+<body>
+
+  <div id="info">
+    <strong>Distance:</strong> <span id="distance">0 km</span>
+    <button id="generateRoute">Generate Route</button>
+  </div>
+  <gmp-map
+    center="37.4220656,-122.0840897"
+    zoom="10"
+    map-id="DEMO_MAP_ID"
+    style="height: 400px"
+></gmp-map>
+</body>
+</html>
