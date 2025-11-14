@@ -38,10 +38,13 @@
          {{activity.title}}
         </div>
         <div class="card-body">
-          <h1 class="card-title"> ROUTE</h1>
-          {{activity.distance}}
-          <!--<button type="button" class="btn btn-lg btn-outline-primary">Details</button>-->
-      
+          <h1 class="card-title"> {{activity.distance}}mi, {{activity.duration_minute}}min</h1>
+          {%if activity.route%}
+            <img src="{{ url_for('static', filename='route_images/' ~ activity.route.image_name) }}" alt="Route-Map" class="route-img" id = "routePic">
+        {%endif%}
+        {%if user.admin%}
+        <button onclick="deleteActivity('{{activity.aid}}')">Delete Activity</button>   
+        {%endif%}   
         </div>
         </div>
         </div>
@@ -57,7 +60,7 @@
         </div>
         <div class="card-body">
           <h1 class="card-title"> <!--activity.route --> Insert Image Here </h1>
-          <!-- activity.distance--> 2 mi, <!-- activity.time --> 60 min
+          <!-- activity.distance--> 2 mi, <!-- activity.time --> 60 mi
           <!--<button type="button" class="btn btn-lg btn-outline-primary">Details</button>-->
         </div>
         </div>

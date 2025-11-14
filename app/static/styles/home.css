@@ -44,8 +44,9 @@ body{
     margin-top: 20x;
 }
 .cardEx{
-    min-width: 320px;
-    max-width: 320px;
+    width: 80%;
+    height: 80%;
+    block-size: 50%;
     padding: 3%;
     text-align: center;
     justify-items: right;
@@ -64,4 +65,7 @@ body{
     margin-top: 1%;
 
 
+}
+#routePic{
+    width: 100%;
 }

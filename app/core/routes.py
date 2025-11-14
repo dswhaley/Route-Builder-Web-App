@@ -100,8 +100,8 @@ def get_profile():
 @bp.get("/")
 @bp.get("/home/")
 def go_home():
-    activities = get_activities()
-    return render_template("home.html", activities = activities)
+    home_activities = get_activities_by_date()
+    return render_template("home.html", activities = home_activities, user=current_user)
 # @bp.get('/')
 # @login_required
 # def index():
