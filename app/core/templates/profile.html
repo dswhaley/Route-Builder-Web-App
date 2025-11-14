@@ -10,7 +10,14 @@
       crossorigin="anonymous"></script>
 </head>
 <body>
-<header>{{user.name}}'s Profile</header>
-
+<header>{{current_user.username}}'s Profile</header>
+<li>
+    <ul>Email: {{current_user.email}}</ul>
+    <ul>Date of Birth: {{current_user.dob}}</ul>
+    {%if {{current_user.admin}} %}
+    <ul>Is Admin</ul>
+    {%endif%}
+    
+</li>
 </body>
 </html>
