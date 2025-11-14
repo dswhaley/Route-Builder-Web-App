@@ -99,6 +99,15 @@ def init_app_db():
         Activity(user_id=2, title="Run 3", distance=20, description="another test", # type: ignore[call-arg]
                  start_time=datetime(2025, 11, 5, 7, 0), type=Type.RUN, duration_minute=20), # type: ignore[call-arg]     
     ]
+
+    user_routes = [
+    UserRoutes(uid=1, rid=1),   # type: ignore[call-arg]
+    UserRoutes(uid=1, rid=2),   # type: ignore[call-arg]
+    UserRoutes(uid=2, rid=3),   # type: ignore[call-arg]
+    ]
+
+    db.session.add_all(user_routes)
+    db.session.commit()
     
     db.session.add_all(activities)
     db.session.commit()

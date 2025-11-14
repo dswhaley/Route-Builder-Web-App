@@ -28,7 +28,7 @@ def add_activity_form():
 
     form.route.choices = [('', '-- None --')] + [(str(r.rid), r.route_name) for r in routes]    # type: ignore[assignment]
 
-    return render_template("activity.html", form = form)
+    return render_template("activity.html", form=form, routes=routes)
 
 @bp.get("/my_activities/<int:id>/")
 @login_required
@@ -100,7 +100,8 @@ def get_profile():
 @bp.get("/")
 @bp.get("/home/")
 def go_home():
-    return render_template("home.html")
+    home_activities = get_activities_by_date()
+    return render_template("home.html", activities = home_activities, user=current_user)
 # @bp.get('/')
 # @login_required
 # def index():
