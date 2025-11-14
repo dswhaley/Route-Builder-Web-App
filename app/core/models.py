@@ -90,13 +90,13 @@ def init_app_db():
 
     # --- ACTIVITIES ---
     activities = [
-        Activity(user_id=1, route_id=1, title="Run 1", description="test run", # type: ignore[call-arg]
-                 start_time=datetime(2025, 11, 10, 8, 0), type=Type.RUN, duration_minute=30), # type: ignore[call-arg]
-        Activity(user_id=2, route_id=2, title="Ride 1", description="just testing", # type: ignore[call-arg]
+        Activity(user_id=1, route_id=1, distance=15.1, title="Run 1", description="test run", # type: ignore[call-arg]
+                 start_time=datetime(2025, 11, 10, 8, 0),  type=Type.RUN, duration_minute=30), # type: ignore[call-arg]
+        Activity(user_id=2, route_id=2, title="Ride 1", distance=20, description="just testing", # type: ignore[call-arg]
                  start_time=datetime(2025, 11, 11, 9, 0), type=Type.RIDE, duration_minute=45), # type: ignore[call-arg]
-        Activity(user_id=3, route_id=3, title="Run 2", description="another test", # type: ignore[call-arg]
+        Activity(user_id=3, route_id=3, title="Run 2", distance=13.1, description="another test", # type: ignore[call-arg]
                  start_time=datetime(2025, 11, 12, 7, 0), type=Type.RUN, duration_minute=20), # type: ignore[call-arg]
-        Activity(user_id=2, title="Run 3", description="another test", # type: ignore[call-arg]
+        Activity(user_id=2, title="Run 3", distance=20, description="another test", # type: ignore[call-arg]
                  start_time=datetime(2025, 11, 5, 7, 0), type=Type.RUN, duration_minute=20), # type: ignore[call-arg]     
     ]
     
