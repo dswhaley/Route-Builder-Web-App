@@ -1,5 +1,5 @@
 from flask_wtf import FlaskForm
-from wtforms import EmailField, PasswordField, SubmitField, StringField, DateField
+from wtforms import EmailField, PasswordField, SubmitField, StringField, DateField, BooleanField
 from wtforms.validators import InputRequired, Email, Length, DataRequired
 
 MIN_PASSWORD_LENGTH: int = 8
@@ -33,4 +33,7 @@ class SignUpForm(FlaskForm):
     confirm_password: PasswordField = PasswordField('Confirm Password',
         validators=[InputRequired(), Length(min=MIN_PASSWORD_LENGTH)])
     
+    admin: BooleanField = BooleanField("Are you an admin?", default=False)
+
+
     submit: SubmitField = SubmitField("Submit")
