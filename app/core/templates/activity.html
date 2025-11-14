@@ -20,8 +20,6 @@
     </style>
 </head>
 
-<script src="{{ url_for('static', filename='scripts/add_activity.js') }}"></script>
-
 <body>
     <div class="topnav">
   <a href="/profile/">Profile</a>
@@ -59,12 +57,20 @@
             <select id="route" name="route">
                 <option value="">-- None --</option>
                 {% for r in routes %}
-                    <option value="{{ r.rid }}" data-distance="{{ r.distance }}">
+                    <option value="{{ r.rid }}" 
+                            data-distance="{{ r.distance }}"
+                            data-image="{{ url_for('static', filename='route_images/' ~ r.image_name) }}"
+                    >
                         {{ r.route_name }}
                     </option>
                 {% endfor %}
             </select>
     </div>
+
+    <div class="mt-3">
+    <img id="route-image-preview" src="" alt="" style="max-width: 250px; display: none;">
+    </div>
+
     <br>
 
         <div class="question">
@@ -84,5 +90,8 @@
 
 </div>
 </div>
+
+<script src="{{ url_for('static', filename='scripts/add_activity.js') }}"></script>
+
 </body>
 </html>

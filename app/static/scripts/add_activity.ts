@@ -12,6 +12,9 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     }
 
+    const imagePreview = document.getElementById("route-image-preview") as HTMLImageElement;
+
+
     routeSelect.addEventListener("change", () => {
         const selected = routeSelect.value;
 
@@ -28,5 +31,16 @@ document.addEventListener("DOMContentLoaded", () => {
             distanceInput.value = distance.toString();
             distanceInput.readOnly = true;
         }
+
+        const selectedOption = routeSelect.options[routeSelect.selectedIndex];
+        const imgUrl = selectedOption.getAttribute("data-image");
+
+        if (imgUrl && selected !== "") {
+            imagePreview.src = imgUrl;
+            imagePreview.style.display = "block";
+        } else {
+            imagePreview.style.display = "none";
+        }
+        
     });
 });
