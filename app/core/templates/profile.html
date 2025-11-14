@@ -18,11 +18,14 @@
   </div>
 <header id = "h">{{user.username}}'s Profile</header>
 <li id = "list">
+    {%if user.admin %}
+    <ul>Admin</ul>
+    {%endif%}
     <ul>Email: {{user.email}}</ul>
     <ul>Date of Birth: {{user.dob}}</ul>
-    {%if user.admin %}
-    <ul>Is Admin</ul>
-    {%endif%}
+    <ul>Total run miles: {{run_miles}}</ul>
+    <ul>Total ride miles: {{ride_miles}}</ul>
+    
     
 </li>
 </body>

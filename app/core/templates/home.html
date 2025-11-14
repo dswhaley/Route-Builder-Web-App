@@ -27,19 +27,19 @@
 <!-- Page content -->
 
 <div class = "box">
-<div class = "row align-items-left" id = "row">
+<div class = "row align-items-center justify-content-left" id = "row">
         
-        
+        {%for activity in activities%}
         <div class= "col-sm-12 col-md-6 col-lg-6 col-xl-4">
         <div class = "cardEx" id = "card1">
     <div class="card text-center">
        
         <div class="card-header">
-          <!--activity.title--> Run through NY
+         {{activity.title}}
         </div>
         <div class="card-body">
-          <h1 class="card-title"> <!--activity.route --> Insert Image Here </h1>
-          <!-- activity.distance--> 2 mi, <!-- activity.time --> 60 min
+          <h1 class="card-title"> ROUTE</h1>
+          {{activity.distance}}
           <!--<button type="button" class="btn btn-lg btn-outline-primary">Details</button>-->
       
         </div>
@@ -47,7 +47,7 @@
         </div>
         </div>
         
-    
+    {%endfor%}
 
               <div class= "col-sm-12 col-md-6 col-lg-6 col-xl-4">
 <div class = "cardEx">

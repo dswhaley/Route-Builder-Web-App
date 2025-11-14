@@ -71,3 +71,8 @@ def get_user(id):
     row: Sequence[Row[Tuple[User]]] = db.session.execute(query).all()
     return row[0][0]
 
+def all_activites():
+    query: Select[Tuple[Activity]] = db.select(Activity)
+    rows: Sequence[Row[Tuple[User]]] = db.session.execute(query).all()
+    routes: list[Route] = [row[0] for row in rows]
+    return routes
