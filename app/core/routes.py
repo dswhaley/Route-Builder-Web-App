@@ -28,7 +28,7 @@ def add_activity_form():
 
     form.route.choices = [('', '-- None --')] + [(str(r.rid), r.route_name) for r in routes]    # type: ignore[assignment]
 
-    return render_template("activity.html", form = form)
+    return render_template("activity.html", form=form, routes=routes)
 
 @bp.get("/my_activities/<int:id>/")
 @login_required
