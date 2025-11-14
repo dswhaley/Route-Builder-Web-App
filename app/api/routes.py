@@ -7,9 +7,17 @@ from app import db
 from app.api import bp
 from app.auth.models import UserSchema
 from app.core.models import Activity
-from app.core.getFromDB import get_activities_by_date, get_activity_by_id, get_user_activity, get_users_routes, get_route, get_user
+from app.core.getFromDB import get_activities_by_date, get_activity_by_id, get_user_activity, get_users_routes, get_user
 from app.core.changeDB import remove_activity
 from flask import jsonify
+
+import os, requests
+from dotenv import load_dotenv
+
+
+load_dotenv()
+
+GOOGLE_API_KEY = os.getenv("GOOGLE_MAPS_API_KEY")
 
 ################################################################################
 # REST API
@@ -48,3 +56,4 @@ def get_user_info():
     """Get a JSON object with the current user's id and email address"""
     schema = UserSchema()
     return jsonify(schema.dump(current_user))
+
