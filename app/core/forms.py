@@ -1,8 +1,8 @@
 from enum import Enum
 
 from flask_wtf import FlaskForm
-from wtforms import Form, Field, ValidationError, StringField, DateTimeLocalField, SelectField, SubmitField, IntegerField
-from wtforms.validators import InputRequired, Length, NumberRange
+from wtforms import Form, Field, ValidationError, StringField, DateTimeLocalField, SelectField, SubmitField, IntegerField, FloatField
+from wtforms.validators import InputRequired, Length, NumberRange, Optional
 from datetime import datetime
 from app.core.models import Type
 
@@ -71,6 +71,18 @@ class ActivityForm(FlaskForm):
         validators=[
             InputRequired(message="Please enter the duration in minutes."),
             NumberRange(min=1, max = 1440, message="Duration must be between 1 and 1440 minutes")
+        ]
+    )
+    route: SelectField = SelectField(
+        'Route (optional)',
+        choices=[],
+        validators=[Optional()]
+    )
+    distance: FloatField = FloatField(
+        'Distance (miles)',
+        validators=[
+            Optional(),
+            NumberRange(min=0.1, message="Distance must be positive.")
         ]
     )
 
