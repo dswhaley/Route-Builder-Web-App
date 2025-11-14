@@ -8,12 +8,11 @@ from app import db
 from app.core import bp
 from app.core.forms import ActivityForm
 from app.auth.models import User
-from app.core.models import Activity
-
+from app.core.models import Activity, Type
 import os
 from dotenv import load_dotenv
 
-from .getFromDB import get_activities_by_date, get_user_activity, get_users_routes, get_route, get_user
+from .getFromDB import get_activities_by_date, get_user_activity, get_users_routes, get_route, get_user, get_user_total_miles_given_activity
 
 
 load_dotenv()
