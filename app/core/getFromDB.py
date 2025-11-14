@@ -7,9 +7,8 @@ from app.auth.models import User
 from typing import Sequence, Tuple
 from sqlalchemy import Row, Result, Select, func
 from app import db
-from sqlalchemy import desc
-
-
+from sqlalchemy import desc, func
+from app.core.models import Type
 
 def get_activity_by_id(aid):
     query: Select[Tuple[Activity]] = (
@@ -18,6 +17,7 @@ def get_activity_by_id(aid):
         )
     rows = db.session.execute(query).all()
     return rows[0][0]
+
 def get_activities_by_date():
     query: Select[Tuple[Activity]] = (
         db.select(Activity)
@@ -46,6 +46,20 @@ def get_users_routes(id):
     routes: list[Route] = [row[0] for row in rows]
 
     return routes
+
+
+def get_user_total_miles_given_activity(user_id, type: Type):
+    query = (
+        db.select(func.sum(Activity.distance))      
+        .where(Activity.user_id == user_id)
+        .where(Activity.type == type)
+    )
+    row = db.session.execute(query).all()
+    row = row[0][0]
+    if row is None:
+        row = 0
+    return row
+
 
 def get_route(id):
     query: Select[Tuple[Route]] = db.select(Route).where(Route.rid == id)
