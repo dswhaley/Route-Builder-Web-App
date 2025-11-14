@@ -88,6 +88,14 @@ def add_activity():
     return redirect(url_for('core.go_home'))
 
 
+@bp.get("/profile/")
+@login_required
+def get_profile():
+    run_miles = get_user_total_miles_given_activity(current_user.id, Type.RUN)
+    ride_miles = get_user_total_miles_given_activity(current_user.id, Type.RIDE)
+
+    print(f"{current_user.username} ran {run_miles} miles and biked {ride_miles} miles.")
+    return render_template("profile.html", user=current_user, run_miles=run_miles, ride_miles=ride_miles)
 
 @bp.get("/")
 @bp.get("/home/")
