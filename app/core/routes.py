@@ -17,7 +17,7 @@ from .getFromDB import get_activities_by_date, get_user_activity, get_users_rout
 
 load_dotenv()
 
-@bp.get("/create_activity")
+@bp.get("/create_activity/")
 @login_required
 def add_activity_form():
     form = ActivityForm()
