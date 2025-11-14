@@ -46,16 +46,25 @@
     {{form.duration_minutes.label}}
     {{form.duration_minutes}}
     </div>
+    <div class="question">
+        {{ form.route.label }}
+            <select id="route" name="route">
+                <option value="">-- None --</option>
+                {% for r in routes %}
+                    <option value="{{ r.rid }}" data-distance="{{ r.distance }}">
+                        {{ r.route_name }}
+                    </option>
+                {% endfor %}
+            </select>
+    </div>
     <br>
-    {#{{form.route.label}}
-    {{form.route}}
+
+        <div class="question">
+            {{ form.distance.label }}
+            <input id="distance" name="distance" type="number" step="0.01"
+                value="{{ form.distance.data or '' }}">
+        </div>
     <br>
-    {{form.distance.label}}
-    {{form.distance}}
-    <br>
-    {{form.speed.label}}
-    {{form.speed}}
-    <br>#}
     {{form.submit()}}
 </form>
 </div>
