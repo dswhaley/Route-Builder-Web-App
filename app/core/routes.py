@@ -8,7 +8,7 @@ from app import db
 from app.core import bp
 from app.core.forms import ActivityForm
 from app.auth.models import User
-from app.core.models import Activity
+from app.core.models import Activity, UserRoutes, Route, Type
 
 import os
 from dotenv import load_dotenv
@@ -22,6 +22,13 @@ load_dotenv()
 @login_required
 def add_activity_form():
     form = ActivityForm()
+
+    user_route_links = UserRoutes.query.filter_by(uid=current_user.id).all()
+    user_route_ids = [ur.rid for ur in user_route_links]
+    routes = Route.query.filter(Route.rid.in_(user_route_ids)).all()
+
+    form.route.choices = [('', '-- None --')] + [(str(r.rid), r.route_name) for r in routes]    # type: ignore[assignment]
+
     return render_template("activity.html", form = form)
 
 @bp.get("/my_activities/<int:id>/")
@@ -43,13 +50,32 @@ def get_home():
 def add_activity():
     form = ActivityForm()
 
-    if form.validate():
+    # Load user’s routes (must be repeated for POST)
+    user_route_links = UserRoutes.query.filter_by(uid=current_user.id).all()
+    user_route_ids = [ur.rid for ur in user_route_links]
+    routes = Route.query.filter(Route.rid.in_(user_route_ids)).all()
+
+    form.route.choices = [('', '-- None --')] + [(str(r.rid), r.route_name) for r in routes]  # type: ignore[assignment]
+    if form.validate_on_submit():
         title = form.title.data
-        type = form.type.data
+        type = Type[form.type.data]
         start_time = form.start_time.data
         duration_minutes = form.duration_minutes.data
 
-        activity = Activity(user_id=current_user.id, title=title, type=type, start_time=start_time, duration_minute=duration_minutes) # type: ignore[call-arg]
+        #no route selected
+        if not form.route.data:
+            if not form.distance.data:
+                flash("Please enter a distance or select a route.")
+                return redirect(url_for('core.add_activity_form'))
+            distance_val = form.distance.data
+            route_id = None
+
+        else:
+            selected_route = Route.query.get(int(form.route.data))
+            distance_val = selected_route.distance  # type: ignore[call-arg]
+            route_id = selected_route.rid           # type: ignore[call-arg]
+
+        activity = Activity(user_id=current_user.id, title=title, type=type, start_time=start_time, duration_minute=duration_minutes, distance=distance_val, route_id=route_id) # type: ignore[call-arg]
         db.session.add(activity)
         db.session.commit()
 
@@ -58,7 +84,7 @@ def add_activity():
     else:
         for field,error_msg in form.errors.items():
             flash(f"{field}: {error_msg}")
-            return redirect(url_for('add_activity_form'))
+            return redirect(url_for('core.add_activity_form'))
 
     return redirect(url_for('core.go_home'))
 
