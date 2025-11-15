@@ -24,3 +24,10 @@ body {background-color: rgba(81, 120, 81); color: rgb(185, 225, 238);}
 .topnav a:hover {
   color:  rgb(185, 225, 238);
 }
+
+input {
+        width: 100%;
+    }
+select{
+        width: 100%;
+    }
