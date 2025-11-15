@@ -86,4 +86,4 @@ class ActivityForm(FlaskForm):
         ]
     )
 
-    submit = SubmitField("Create Avtivity")
+    submit = SubmitField("Create Activity")
