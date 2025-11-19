@@ -47,18 +47,17 @@
     {{form.duration_minutes}}
     </div>
     <div class="question">
-        {{ form.route.label }}
-            <select id="route" name="route">
-                <option value="">-- None --</option>
-                {% for r in routes %}
-                    <option value="{{ r.rid }}" 
-                            data-distance="{{ r.distance }}"
-                            data-image="{{ url_for('static', filename='route_images/' ~ r.image_name) }}"
-                    >
-                        {{ r.route_name }}
-                    </option>
-                {% endfor %}
-            </select>
+    {{ form.route.label }}
+    <select id="route" name="route" class="form-select">
+        <option value="">-- None --</option>
+        {% for r in routes %}
+            <option value="{{ r.rid }}"
+                    data-distance="{{ r.distance }}"
+                    data-image="{{ url_for('static', filename='route_images/' ~ r.image_name) }}">
+                {{ r.route_name }} — {{ r.distance }} miles
+            </option>
+        {% endfor %}
+    </select>
     </div>
 
     <div class="mt-3">
