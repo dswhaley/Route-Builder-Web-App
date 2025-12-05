@@ -14,8 +14,11 @@ from flask import jsonify
 import os, requests
 from dotenv import load_dotenv
 
+from flask_cors import CORS # Import Flask-CORS for handling cross-origin requests
+
 
 load_dotenv()
+CORS(bp) # Enable CORS for your Flask app
 
 GOOGLE_API_KEY = os.getenv("GOOGLE_MAPS_API_KEY")
 
@@ -45,10 +48,29 @@ def delete_activity(aid):
     return jsonify({"message": "Activity deleted successfully"}), 200
 
 
+################################################################################
+# GOOGLE API
+################################################################################
 
+@bp.get("/")
+@login_required
+def google_route_wrapper():
+    args = request.json
+
+    # if it matches our database, fetch it
+
+    # else, make a new request
     
 
+    return ""
 
+
+@bp.route('/get-google-api-key', methods=['GET'])
+def get_google_api_key():
+    # You might want to add authentication/authorization logic here
+    # For example, check if the user is logged in before returning the key.
+    
+    return jsonify({"apiKey": GOOGLE_API_KEY})
 
 @bp.get('/user-info/')
 @login_required
@@ -56,4 +78,3 @@ def get_user_info():
     """Get a JSON object with the current user's id and email address"""
     schema = UserSchema()
     return jsonify(schema.dump(current_user))
-

@@ -1,48 +1,117 @@
-/// <reference types="@types/google.maps" />
-
 let map: google.maps.Map;
+let markers: google.maps.marker.AdvancedMarkerElement[] = [];
+let routePolyline: google.maps.Polyline;
 
-async function initMap(): Promise<void> {
-  const { Map } = await google.maps.importLibrary("maps") as google.maps.MapsLibrary;
-  const { AdvancedMarkerElement } = await google.maps.importLibrary("marker") as google.maps.MarkerLibrary;
+const apiUrl = 'http://localhost:5000/api';
 
-
-
-  const mapElement = document.getElementById("map");
-  if (!mapElement) {
-    console.error("Map container (#map) not found in DOM");
-    return;
-  }
-
-  map = new Map(mapElement, {
-    zoom: 14,
-    center: { lat: 41.1573, lng: -80.0881 }, // Grove City
+function initMap(): void {
+  map = new google.maps.Map(document.getElementById("map") as HTMLElement, {
+    center: { lat: 37.7749, lng: -122.4194 },
+    zoom: 12,
     mapId: "DEMO_MAP_ID",
   });
 
+  routePolyline = new google.maps.Polyline({
+    map: map,
+    strokeColor: "#4285F4",
+    strokeWeight: 5,
+  });
+
   map.addListener("click", (event: google.maps.MapMouseEvent) => {
-    if (event.latLng) {
-      placeMarkerAndPanTo(event.latLng, map, AdvancedMarkerElement);
+    if (event.latLng) addMarker(event.latLng);
+  });
+}
+
+async function fetchApiKey(): Promise<string | null> {
+    try {
+        const response = await fetch(`${apiUrl}/get-google-api-key`);
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        const data = await response.json();
+        return data.apiKey;
+    } catch (error) {
+        console.error('Error fetching API key:', error);
+        return null;
     }
-  });
-
-  console.log("Map initialized");
 }
 
-function placeMarkerAndPanTo(
-  latLng: google.maps.LatLng,
-  map: google.maps.Map,
-  AdvancedMarkerElement: typeof google.maps.marker.AdvancedMarkerElement
-): void {
-  new AdvancedMarkerElement({
-    position: latLng,
-    map,
+function addMarker(location: google.maps.LatLng): void {
+  // Create custom marker element
+  const marker = new google.maps.marker.AdvancedMarkerElement({
+    position: location,
+    map: map,
   });
 
-  map.panTo(latLng);
+  markers.push(marker);
+
+  if (markers.length >= 2) calculateRoute();
 }
 
 
-document.addEventListener("DOMContentLoaded", () => {
-  initMap().catch((err) => console.error("Failed to initialize map:", err));
-});
+
+
+async function calculateRoute(): Promise<void> {
+  if (markers.length < 2) return;
+
+ function toRoutesLatLng(position: google.maps.LatLng | google.maps.LatLngLiteral) {
+    if ('lat' in position && typeof position.lat === 'function') {
+      // It's a LatLng object
+      return { latLng: { latitude: position.lat, longitude: position.lng } };
+    } else {
+      // It's already a LatLngLiteral
+      return { latLng: { latitude: position.lat, longitude: position.lng } };
+    }
+  }
+
+
+  const origin = { location: toRoutesLatLng(markers[0].position) };
+  const destination = { location: toRoutesLatLng(markers[markers.length - 1].position) };
+  const intermediates = markers.slice(1, -1).map(m => ({ location: toRoutesLatLng(m.position) }));
+
+
+  const body = {
+    origin,
+    destination,
+    intermediates,
+    travelMode: "WALK",
+    computeAlternativeRoutes: false
+  };
+
+   const googleApiKey = await fetchApiKey();
+
+  try {
+    const res = await fetch("https://routes.googleapis.com/directions/v2:computeRoutes", {
+      method: "POST",
+      headers: { "Content-Type": "application/json", "X-Goog-Api-Key": googleApiKey, "X-Goog-FieldMask": "routes.distanceMeters,routes.duration,routes.polyline.encodedPolyline"},
+      body: JSON.stringify(body)
+    });
+
+    const data = await res.json();
+
+    if (!data.routes || data.routes.length === 0) {
+      console.error("No route returned", data);
+      return;
+    }
+
+    const route = data.routes[0];
+
+    // Draw polyline using geometry.polyline
+    if (!route.polyline || !route.polyline.encodedPolyline) {
+      console.error("No polyline returned", route);
+      return;
+    }
+
+    const decodedPath = google.maps.geometry.encoding.decodePath(route.polyline.encodedPolyline);
+    routePolyline.setPath(decodedPath);
+
+
+    // Total distance
+    let totalDistance = 0;
+    route.legs.forEach((leg: any) => totalDistance += leg.distanceMeters);
+    alert("Total distance: " + (totalDistance / 1000).toFixed(2) + " km");
+
+  } catch (err) {
+    console.error("Routes API error:", err);
+  }
+}

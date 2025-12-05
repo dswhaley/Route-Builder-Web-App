@@ -8,6 +8,7 @@ document.addEventListener("DOMContentLoaded", () => {
             routeData[option.value] = parseFloat(distanceAttr);
         }
     }
+    const imagePreview = document.getElementById("route-image-preview");
     routeSelect.addEventListener("change", () => {
         const selected = routeSelect.value;
         if (selected === "") {
@@ -19,6 +20,15 @@ document.addEventListener("DOMContentLoaded", () => {
         if (distance !== undefined) {
             distanceInput.value = distance.toString();
             distanceInput.readOnly = true;
+        }
+        const selectedOption = routeSelect.options[routeSelect.selectedIndex];
+        const imgUrl = selectedOption.getAttribute("data-image");
+        if (imgUrl && selected !== "") {
+            imagePreview.src = imgUrl;
+            imagePreview.style.display = "block";
+        }
+        else {
+            imagePreview.style.display = "none";
         }
     });
 });

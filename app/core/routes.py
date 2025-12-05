@@ -108,6 +108,7 @@ def go_home():
 #     return redirect(url_for('core.get_accounts'))
 
 @bp.route("/create_route/")
+@login_required
 def create_route():
     google_key = os.getenv("GOOGLE_MAPS_API_KEY")
     return render_template('create_route.html', GOOGLE_MAPS_API_KEY=google_key)
