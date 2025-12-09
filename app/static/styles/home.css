@@ -69,3 +69,6 @@ body{
 #routePic{
     width: 100%;
 }
+#logout{
+    text-align: right;
+}

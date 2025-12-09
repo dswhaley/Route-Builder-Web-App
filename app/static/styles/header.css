@@ -1,0 +1,23 @@
+.topnav {
+  background-color:rgb(9, 1, 103);
+  overflow: hidden;
+  
+}
+
+/* Style the links inside the navigation bar */
+.topnav a {
+  float: left;
+  color:rgb(81, 120, 81);
+  text-align: center;
+  padding: 20px 20px;
+  font-size: 17px;
+}
+
+/* Change the color of links on hover */
+.topnav a:hover {
+  color:  rgb(185, 225, 238);
+}
+
+#logout{
+    align-items: right;
+}
