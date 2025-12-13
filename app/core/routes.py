@@ -1,6 +1,6 @@
 from typing import Sequence, Tuple
 from sqlalchemy import Row, Select
-from flask import  render_template, redirect, url_for, current_app
+from flask import  render_template, redirect, url_for, current_app, jsonify
 from flask_login import login_required, current_user
 from flask import redirect, url_for, render_template, flash
 
@@ -12,6 +12,7 @@ from app.core.models import Activity, UserRoutes, Route, Type
 import os
 from dotenv import load_dotenv
 
+from .models import ActivitySchema
 from .getFromDB import get_activities_by_date, get_user_activity, get_users_routes, get_route, get_user, get_user_total_miles_given_activity
 
 
@@ -43,6 +44,12 @@ def get_home():
     home_activities = get_activities_by_date()
     return render_template("home3.html", activities=home_activities)
 
+
+@bp.get("/activity_json")
+def get_activites_json5():
+    home_activities = get_activities_by_date()
+    schema = ActivitySchema()
+    return jsonify(schema.dump(home_activities, many=True))
 
 @bp.post("/create_activity/")
 @login_required
