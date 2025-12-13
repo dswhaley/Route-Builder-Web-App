@@ -41,7 +41,8 @@ def get_activities(id):
 @login_required
 def get_home():
     home_activities = get_activities_by_date()
-    return render_template("home3.html", activities=home_activities)
+    #return render_template("home3.html", activities=home_activities)
+    return home_activities
 
 
 @bp.post("/create_activity/")
