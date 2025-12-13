@@ -3,8 +3,13 @@ from typing import Any, Sequence, Tuple, List
 from datetime import date, datetime
 
 from sqlalchemy.orm import Mapped, mapped_column, relationship
-from marshmallow_sqlalchemy.fields import Nested
 
+from marshmallow_sqlalchemy.fields import Nested
+from marshmallow_sqlalchemy import SQLAlchemySchema, SQLAlchemyAutoSchema, auto_field
+from marshmallow import fields as ma_fields
+
+
+from marshmallow_sqlalchemy import fields as ma_sql_fields
 from app import db, ma
 from app.auth.models import User, UserSchema
 
@@ -111,3 +116,13 @@ def init_app_db():
     
     db.session.add_all(activities)
     db.session.commit()
+
+################################################################################
+# API JSON Schemas
+################################################################################
+
+class ActivitySchema(SQLAlchemyAutoSchema):
+    class Meta:
+        model = Activity
+
+
