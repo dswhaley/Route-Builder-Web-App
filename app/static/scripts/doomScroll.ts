@@ -1,26 +1,23 @@
-interface Activity {
+namespace ActivityAPI{
+export interface Activity {
     aid: number;
-    user_id: number;
-    route_id: number
-    title: string;
-    description: string;
-    start_time: number;
-    type: string;
+    description?: string;
     distance: number;
     duration_minute: number;
-    image_name: string;
-    user: number;
-    route: number;
-}
-interface ActivityList{
-    activites: Array<Activity>
+    route_id?: number;
+    start_time: number;
+    title: string;
+    type: string;
+    
 }
 
+}
 document.addEventListener("DOMContentLoaded", async () => {
     // find the button and add an event listener
     console.log("begining");
-    const btn: HTMLButtonElement = <HTMLButtonElement> document.getElementById("loadMore");
-    btn.addEventListener("click", addMore);
+    addMore();
+    // const btn: HTMLButtonElement = <HTMLButtonElement> document.getElementById("loadMore");
+    // btn.addEventListener("click", addMore);
     //check with Daniel abt integrating the delete button
     //const d: HTMLButtonElement = <HTMLButtonElement> document.getElementById("");
     //d.addEventListener("click", deleteActivity);
@@ -29,14 +26,14 @@ document.addEventListener("DOMContentLoaded", async () => {
 });
 
 async function addMore(){
-    const url = "/home3/";//create a route that returns the activities
+    const url = "/activity_json";//create a route that returns the activities
     const newActivities = await fetch(url);
-    const response = <ActivityList> await validateJSON(newActivities);
+    const response = await vJSON(newActivities);
     //loop through the new activites
-    //const c = <HTMLDivElement> document.getElementById("card1");
+    //console.log(response.activities);
     const i = document.getElementById("row");
     console.log("hello");
-    for(const a of response.activites){
+    for(const a of response){
         console.log("a");
         let n= document.createElement("div");
         let d = helper(n, a);
@@ -48,13 +45,14 @@ async function addMore(){
     //update the page with the new div
 }
 
-function helper(n : HTMLDivElement, a: Activity){
+function helper(n : HTMLDivElement, a: ActivityAPI.Activity){
     n.classList.add("col-sm-12");
     n.classList.add("col-md-6"); 
     n.classList.add("col-lg-6");
     n.classList.add("col-xl-4");
     let b = document.createElement("div");
     b.classList.add("cardEx");
+    b.id = "card1";
     n.appendChild(b);
     let c = document.createElement("div");
     c.classList.add("card");
@@ -63,22 +61,30 @@ function helper(n : HTMLDivElement, a: Activity){
     let d = document.createElement("div")
     d.classList.add("card-header");
     d.innerText = a.title;
-    b.appendChild(d);
+    c.appendChild(d);
+    let y = document.createElement("div");
+    y.classList.add("card-body");
+    c.appendChild(y);
     let z = document.createElement("h1");
     z.classList.add("card-title");
     z.innerText = a.distance + "mi " + a.duration_minute + "min";
-    b.appendChild(z);
+    y.appendChild(z);
+    if(a.route_id != null){
     let e = document.createElement("img");
-    e.src = "/static/route_images/" + a.image_name + ".png";
-    b.appendChild(e);
+    e.src = "/static/route_images/" + a.route_id + ".png";
+    e.alt = "Route-" + a.route_id + "-Map";
+    e.classList.add("route-img");
+    e.id = "routePic";
+    y.appendChild(e);
+    }
     let f = document.createElement("button");
     f.id = "delete";
     f.innerText = "Delete Activity"
-    b.appendChild(f);
+    y.appendChild(f);
     return n;
 }
 
-function validateJSON(response: Response) {
+function vJSON(response: Response) {
     if (response.ok) {
         return response.json();
     } else {
