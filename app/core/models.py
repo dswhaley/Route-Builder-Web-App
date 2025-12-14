@@ -125,6 +125,6 @@ class ActivitySchema(SQLAlchemyAutoSchema):
     class Meta:
         model = Activity
     route_id = auto_field()
-    user_id = auto_field
+    user_id = auto_field()
 
 

@@ -1,3 +1,6 @@
+var ActivityAPI;
+(function (ActivityAPI) {
+})(ActivityAPI || (ActivityAPI = {}));
 document.addEventListener("DOMContentLoaded", async () => {
     console.log("begining");
     addMore();
@@ -30,7 +33,7 @@ function helper(n, a) {
     b.appendChild(c);
     let d = document.createElement("div");
     d.classList.add("card-header");
-    d.innerText = a.title;
+    d.innerText = a.user_id + "'s " + a.title;
     c.appendChild(d);
     let y = document.createElement("div");
     y.classList.add("card-body");
@@ -39,6 +42,9 @@ function helper(n, a) {
     z.classList.add("card-title");
     z.innerText = a.distance + "mi " + a.duration_minute + "min";
     y.appendChild(z);
+    let x = document.createElement("div");
+    x.innerText = a.description;
+    y.appendChild(x);
     if (a.route_id != null) {
         let e = document.createElement("img");
         e.src = "/static/route_images/" + a.route_id + ".png";
@@ -48,10 +54,29 @@ function helper(n, a) {
         y.appendChild(e);
     }
     let f = document.createElement("button");
-    f.id = "delete";
+    f.id = a.aid.toString();
     f.innerText = "Delete Activity";
+    f.onclick = () => { deleteActivity(a.aid); };
     y.appendChild(f);
     return n;
+}
+async function deleteActivity(aid) {
+    const response = await fetch(`/api/activities/${aid}`, {
+        method: "DELETE"
+    });
+    if (response.status === 404) {
+        alert("Activity doesn't exist");
+    }
+    else if (response.status === 401) {
+        alert("You are not authorized to delete this activity.");
+    }
+    else {
+        const card = document.getElementById(`activity-${aid}`);
+        if (card) {
+            card.remove();
+        }
+        window.location.reload();
+    }
 }
 function vJSON(response) {
     if (response.ok) {
