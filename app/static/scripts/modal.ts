@@ -9,24 +9,32 @@ export interface Routes {
 export interface RouteList{
     data: undefined | {routes: Array<Routes>};
 }
-const activityLink = document.getElementById("activity-button")
-activityLink.addEventListener("click", activateModal);
+const modalElement = document.getElementById("formModal");
+modalElement.addEventListener('show.bs.modal', activateModal);
 
 async function activateModal(event: MouseEvent){
   
     const modal = <HTMLInputElement> document.getElementById("create-activity-modal");
     const modalInputsDiv = <HTMLElement> document.getElementById("modal-inputs");
 
+    console.log("Pre-Fetch");
     const routesResponse = await fetch("/routes_json");
+    console.log("Post-Fetch");
+
+    console.log(routesResponse);
     const routes = await validateJSON(routesResponse);
-
+    console.log(routes);
     const routeSelectField = document.getElementById("routes");
+    routeSelectField.innerHTML = '';
 
-    for(let route of routes){
+    for(let route of routes.data){
         const option = document.createElement("option");
-        option.value = route.route_name;
+        option.value = route.rid.toString();
+        option.textContent = route.route_name;
         routeSelectField.appendChild(option);
+
     }
+
 
 
 }
