@@ -21,9 +21,9 @@
 <div class="topnav" id="myTopNav">
   <a href="/profile/">{{user.username}}'s Profile</a>
   <a href="/home/">Home</a>
-  <a href="#" id="activity-button" data-bs-toggle="modal" data-bs-target="#create-activity-modal">
+<a href="#" id="activity-button" data-bs-toggle="modal" data-bs-target="#formModal">
     Add Activity
-  </a>
+</a>
   <a href="/create_route/">Create Route</a>
    <a id = "logout" href = "/auth/logout/"> Logout </a>
    <a href="javascript:void(0);" class="icon" onclick="resize()">
@@ -67,46 +67,45 @@
         </div>
         </div> -->
 
-<!-- <div class="modal fade show" id="formModal" tabindex="-1" aria-labelledby="formModalLabel" aria-modal="true" role="dialog" style="display: block; padding-left: 0px;">
+  <div class="modal fade" id="formModal" tabindex="-1" aria-labelledby="formModalLabel" aria-modal="true" role="dialog">
       <div class="modal-dialog">
-        <div class="modal-content">
-          <div class="modal-header">
-            <h1 class="modal-title fs-5" id="formModalLabel">Create Activity</h1>
-            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cancel"></button>
+          <div class="modal-content">
+              <div class="modal-header">
+                  <h1 class="modal-title fs-5" id="formModalLabel">Create Activity</h1>
+                  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cancel"></button>
+              </div>
+              <div class="modal-body text-align-center">
+
+                  <div id="modal-inputs">
+                      <label for="title" class="form-label">Activity Title</label>
+                      <input type="text" id="title" class="form-control">
+                      
+                      <label for="type" class="form-label">Activity Type</label>
+                      <select id="type" class="form-control" required>
+                          <option value="" disabled selected>Select activity type</option>
+                          <option value="Run">Run</option>
+                          <option value="Ride">Ride</option>
+                      </select>
+
+                      <label for="routes" class="form-label">Route</label>
+                      <select id="routes" class="form-control"></select>
+
+                      <label for="start-time" class="form-label">Start Time</label>
+                      <input type="datetime-local" id="start-time" class="form-control">
+
+                      <label for="duration" class="form-label">Duration (minutes)</label>
+                      <input type="number" id="duration" class="form-control">
+
+                      <label for="distance" class="form-label">Distance (Miles)s</label>
+                      <input type="number" id="distance" class="form-control">         
+                  </div>
+              </div>
+              <div class="modal-footer">
+                  <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                  <button type="button" class="btn btn-primary" id="post-button">Save Activity</button>
+              </div>
           </div>
-          <div class="modal-body text-align-center">
-
-            <div id="modal-inputs">
-              <label for="title" class="form-label">Activity Title</label>
-              <input type="text" id="title" class="form-control">
-              
-              <label for="type" class="form-label">Activity Type</label>
-              <select id="type" class="form-control" required>
-                <option value="" disabled selected>Select activity type</option>
-                <option value="Run">Run</option>
-                <option value="Ride">Ride</option>
-              </select>
-
-              <label for="routes" class="form-label">Route</label>
-              <select id="routes" class="form-control"></select>
-
-              <label for="start-time" class = "form-label">Start Time</label>
-              <input type="datetime-local" id="start-time" class="form-control">
-
-              <label for="duration" class="form-label">Duration (minutes)</label>
-              <input type="number" id="duration" class="form-control">
-
-              <label for="distance" class="form-label">Distance (Miles)s</label>
-              <input type="number" id="distance" class="form-control">         
-            </div>
-          </div>
-          <div class="modal-footer">
-            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-            <button type="button" class="btn btn-primary" id="post-button">Save Activity</button>
-          </div>
-        </div>
       </div>
-    </div>
-    <div class="modal-backdrop fade show"></div> -->
+  </div>
 </body>
 </html>
