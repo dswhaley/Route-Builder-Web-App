@@ -72,6 +72,7 @@ def get_google_api_key():
     
     return jsonify({"apiKey": GOOGLE_API_KEY})
 
+
 @bp.get('/user-info/')
 @login_required
 def get_user_info():

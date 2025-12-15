@@ -3,6 +3,28 @@ let markers = [];
 let routePolyline;
 let elevationService;
 const apiUrl = 'http://localhost:5000/api';
+document.addEventListener("DOMContentLoaded", () => {
+    const createBtn = document.getElementById('createBtn');
+    createBtn.addEventListener('click', handleCreateClick);
+    const eraseBtn = document.getElementById('eraseBtn');
+    eraseBtn.addEventListener('click', handleEraseClick);
+    function handleCreateClick(event) {
+        console.log('Button was clicked!');
+        const output = document.getElementById('outputArea');
+        if (output) {
+            output.textContent = 'Button clicked at ' + new Date().toLocaleTimeString();
+        }
+        event.preventDefault();
+    }
+    function handleEraseClick(event) {
+        console.log('Erase Button was clicked!');
+        markers.forEach(marker => {
+            marker.map = null;
+        });
+        markers = [];
+        routePolyline.setPath([]);
+    }
+});
 function initMap() {
     map = new google.maps.Map(document.getElementById("map"), {
         center: { lat: 37.7749, lng: -122.4194 },
@@ -108,5 +130,6 @@ function getRouteElevation(path) {
         }
         console.log("Elevation gain (m):", totalGain.toFixed(1));
         alert(`Elevation gain: ${totalGain.toFixed(1)} m`);
+        return totalGain;
     });
 }
