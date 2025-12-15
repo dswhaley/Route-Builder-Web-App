@@ -9,7 +9,9 @@
       integrity="sha384-HwwvtgBNo3bZJJLYd8oVXjrBZt8cqVSpeBNS5n7C8IVInixGAoxmnlMuBnhbgrkm" 
       crossorigin="anonymous"></script>
     <script src="{{ url_for('static', filename='scripts/homepage_manager.js') }}" defer></script>
-<script src="/static/scripts/doomScroll.js"></script>    <link rel="stylesheet" href="/static/styles/home.css">
+<script src="/static/scripts/doomScroll.js"></script>   
+<script src="/static/scripts/modal.js"></script>    
+<link rel="stylesheet" href="/static/styles/home.css">
 </head>
 <body>
 <!-- Outline for home page -->
@@ -17,7 +19,7 @@
 <div class="topnav">
   <a href="/profile/">Profile</a>
   <a href="/home/">Home</a>
-  <a href="#" data-bs-toggle="modal" data-bs-target="#create-activity-modal">
+  <a href="#" id="activity-button" data-bs-toggle="modal" data-bs-target="#create-activity-modal">
     Add Activity
   </a>
   <a href="/create_route/">Create Route</a>
