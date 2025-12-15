@@ -6,7 +6,7 @@ from flask_login import login_required, current_user
 from app import db
 from app.api import bp
 from app.auth.models import UserSchema
-from app.core.models import Activity
+from app.core.models import Activity, Route, RouteSchema
 from app.core.getFromDB import get_activities_by_date, get_activity_by_id, get_user_activity, get_users_routes, get_user
 from app.core.changeDB import remove_activity
 from flask import jsonify
