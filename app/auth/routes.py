@@ -62,6 +62,8 @@ def post_sign_up():
 
 
 
+@bp.post('/user_json/<int:uid>')
+
 @bp.post('/login/')
 def post_login():
     form: LoginForm = LoginForm()

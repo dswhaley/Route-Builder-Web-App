@@ -7,11 +7,11 @@ async function activateModal(event) {
     const routesResponse = await fetch("/routes_json");
     console.log("Post-Fetch");
     console.log(routesResponse);
-    const routes = await validateJSON(routesResponse);
-    console.log(routes);
+    const routeList = await validateJSON(routesResponse);
+    const routesArray = routeList.data.routes;
     const routeSelectField = document.getElementById("routes");
     routeSelectField.innerHTML = '';
-    for (let route of routes.data) {
+    for (let route of routesArray) {
         const option = document.createElement("option");
         option.value = route.rid.toString();
         option.textContent = route.route_name;

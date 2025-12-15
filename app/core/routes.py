@@ -3,6 +3,7 @@ from sqlalchemy import Row, Select
 from flask import  render_template, redirect, url_for, current_app, jsonify
 from flask_login import login_required, current_user
 from flask import redirect, url_for, render_template, flash
+from app.auth.models import User, UserSchema
 
 from app import db
 from app.core import bp
@@ -13,7 +14,7 @@ import os
 from dotenv import load_dotenv
 
 from .models import ActivitySchema
-from .getFromDB import get_activities_by_date, get_user_activity, get_users_routes, get_route, get_user, get_user_total_miles_given_activity
+from .getFromDB import get_activities_by_date, get_user_activity, get_users_routes, get_route, get_user_total_miles_given_activity
 
 
 load_dotenv()
@@ -134,4 +135,13 @@ def get_routes():
     schema = RouteSchema()
     return jsonify(schema.dump(routes, many=True))
 
+
+@bp.post('/user_json/<int:uid>')
+def get_user(uid):
+    query = db.select(User).where(User.id == uid)
+    rows = db.session.execute(query).all()
+    
+    user = [row[0] for row in rows]
+    schema = UserSchema()
+    return jsonify(schema.dump(user, many=False))
 

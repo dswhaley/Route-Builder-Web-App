@@ -126,6 +126,11 @@ class ActivitySchema(SQLAlchemyAutoSchema):
         model = Activity
     route_id = auto_field()
     user_id = auto_field()
+    username = ma_fields.Method("get_username")
+
+    def get_username(self, activity):
+        return activity.user.username if activity.user else None
+    
 
 class RouteSchema(SQLAlchemyAutoSchema):
     class Meta:
