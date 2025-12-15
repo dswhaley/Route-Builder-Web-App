@@ -127,4 +127,7 @@ class ActivitySchema(SQLAlchemyAutoSchema):
     route_id = auto_field()
     user_id = auto_field()
 
+class RouteSchema(SQLAlchemyAutoSchema):
+    class Meta:
+        model = Route
 

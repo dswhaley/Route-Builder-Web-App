@@ -8,7 +8,7 @@ from app import db
 from app.core import bp
 from app.core.forms import ActivityForm
 from app.auth.models import User
-from app.core.models import Activity, UserRoutes, Route, Type
+from app.core.models import Activity, UserRoutes, Route, Type, RouteSchema
 import os
 from dotenv import load_dotenv
 
@@ -133,35 +133,17 @@ def add_route_to_db():
     return ""
     
 
-# @bp.get('/accounts/')
-# @login_required
-# def get_accounts():
-#     accounts: list[Account] = get_all_accounts()
-#     return render_template('index.html', accounts=accounts)
-
-# # TODO: define routes for listing Banks and Customers
-# @bp.get('/banks/')
-# @login_required
-# def get_banks():
-#     query: Select[Tuple[Account]] = db.select(Bank)
-#     rows = db.session.execute(query).all()
-#     banks = [row[0] for row in rows]
-
-#     return render_template('banks.html', banks=banks)
-
-# @bp.get('/customers/')
-# @login_required
-# def get_customers():
-#     query: Select[Tuple[Account]] = db.select(Customer)
-#     rows = db.session.execute(query).all()
-#     customers = [row[0] for row in rows]
-
-#     return render_template('customers.html', customers=customers)
 
 
 
-# def get_all_accounts() -> list[Account]:
-#     query: Select[Tuple[Account]] = db.select(Account)
-#     rows:  Sequence[Row[Tuple[Account]]] = db.session.execute(query).all()
-#     accounts: list[Account] = [row[0] for row in rows]
-#     return accounts
+
+@bp.get("/routes_json/")
+def get_routes():
+    query = db.select(Route)
+    rows = db.session.execute(query).all()
+    
+    routes = [row[0] for row in rows]
+    schema = RouteSchema()
+    return jsonify(schema.dump(routes, many=True))
+
+
