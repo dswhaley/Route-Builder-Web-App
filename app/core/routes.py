@@ -46,7 +46,7 @@ def get_home():
     return home_activities
 
 
-@bp.get("/activity_json")
+@bp.get("/activity_json/")
 def get_activites_json5():
     home_activities = get_activities_by_date()
     schema = ActivitySchema()

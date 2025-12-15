@@ -1,22 +1,4 @@
-.topnav {
-  background-color:rgb(9, 1, 103);
-  overflow: hidden;
-  
-}
 
-/* Style the links inside the navigation bar */
-.topnav a {
-  float: left;
-  color:rgb(81, 120, 81);
-  text-align: center;
-  padding: 20px 20px;
-  font-size: 17px;
-}
-
-/* Change the color of links on hover */
-.topnav a:hover {
-  color:  rgb(185, 225, 238);
-}
 
 body{
     background-color: rgb(81, 120, 81);
@@ -40,35 +22,26 @@ body{
 } */
 
 
-#selectionBar{
+/* #selectionBar{
     margin-top: 20x;
-}
+} */
 .cardEx{
-    width: 80%;
-    height: 80%;
+    /* min-width: 80%;
+    min-height: 80%; */
+    width: 320px;
+    height: 320px;
     block-size: 50%;
     padding: 3%;
     text-align: center;
     justify-items: right;
-    
 }
 
 .row{
     width: 100vw;
 }
 
-#loadMore{
-   text-align: center;
-    background-color: rgb(185, 225, 238);
-    color:  rgba(81, 120, 81);
-    margin-left: 40%;
-    margin-top: 1%;
-
-
-}
 #routePic{
-    width: 100%;
+    width: 80%;
 }
-#logout{
-    text-align: right;
-}
+
+

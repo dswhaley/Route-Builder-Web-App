@@ -1,15 +1,17 @@
+var ActivityAPI;
+(function (ActivityAPI) {
+})(ActivityAPI || (ActivityAPI = {}));
 document.addEventListener("DOMContentLoaded", async () => {
     console.log("begining");
-    const btn = document.getElementById("loadMore");
-    btn.addEventListener("click", addMore);
+    addMore();
 });
 async function addMore() {
-    const url = "/home3/";
+    const url = "/activity_json";
     const newActivities = await fetch(url);
-    const response = await validateJSON(newActivities);
+    const response = await vJSON(newActivities);
     const i = document.getElementById("row");
     console.log("hello");
-    for (const a of response.activites) {
+    for (const a of response) {
         console.log("a");
         let n = document.createElement("div");
         let d = helper(n, a);
@@ -23,6 +25,7 @@ function helper(n, a) {
     n.classList.add("col-xl-4");
     let b = document.createElement("div");
     b.classList.add("cardEx");
+    b.id = "card1";
     n.appendChild(b);
     let c = document.createElement("div");
     c.classList.add("card");
@@ -30,22 +33,52 @@ function helper(n, a) {
     b.appendChild(c);
     let d = document.createElement("div");
     d.classList.add("card-header");
-    d.innerText = a.title;
-    b.appendChild(d);
+    d.innerText = a.user_id + "'s " + a.title;
+    c.appendChild(d);
+    let y = document.createElement("div");
+    y.classList.add("card-body");
+    c.appendChild(y);
     let z = document.createElement("h1");
     z.classList.add("card-title");
     z.innerText = a.distance + "mi " + a.duration_minute + "min";
-    b.appendChild(z);
-    let e = document.createElement("img");
-    e.src = "/static/route_images/" + a.image_name + ".png";
-    b.appendChild(e);
+    y.appendChild(z);
+    let x = document.createElement("div");
+    x.innerText = a.description;
+    y.appendChild(x);
+    if (a.route_id != null) {
+        let e = document.createElement("img");
+        e.src = "/static/route_images/" + a.route_id + ".png";
+        e.alt = "Route-" + a.route_id + "-Map";
+        e.classList.add("route-img");
+        e.id = "routePic";
+        y.appendChild(e);
+    }
     let f = document.createElement("button");
-    f.id = "delete";
+    f.id = a.aid.toString();
     f.innerText = "Delete Activity";
-    b.appendChild(f);
+    f.onclick = () => { deleteActivity(a.aid); };
+    y.appendChild(f);
     return n;
 }
-function validateJSON(response) {
+async function deleteActivity(aid) {
+    const response = await fetch(`/api/activities/${aid}`, {
+        method: "DELETE"
+    });
+    if (response.status === 404) {
+        alert("Activity doesn't exist");
+    }
+    else if (response.status === 401) {
+        alert("You are not authorized to delete this activity.");
+    }
+    else {
+        const card = document.getElementById(`activity-${aid}`);
+        if (card) {
+            card.remove();
+        }
+        window.location.reload();
+    }
+}
+function vJSON(response) {
     if (response.ok) {
         return response.json();
     }
