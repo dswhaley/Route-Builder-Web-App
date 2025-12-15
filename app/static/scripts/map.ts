@@ -1,6 +1,7 @@
 let map: google.maps.Map;
 let markers: google.maps.marker.AdvancedMarkerElement[] = [];
 let routePolyline: google.maps.Polyline;
+let elevationService: google.maps.ElevationService;
 
 const apiUrl = 'http://localhost:5000/api';
 
@@ -16,6 +17,8 @@ function initMap(): void {
     strokeColor: "#4285F4",
     strokeWeight: 5,
   });
+
+  elevationService = new google.maps.ElevationService();
 
   map.addListener("click", (event: google.maps.MapMouseEvent) => {
     if (event.latLng) addMarker(event.latLng);
@@ -105,13 +108,46 @@ async function calculateRoute(): Promise<void> {
     const decodedPath = google.maps.geometry.encoding.decodePath(route.polyline.encodedPolyline);
     routePolyline.setPath(decodedPath);
 
+    const elevation = getRouteElevation(decodedPath);
+
 
     // Total distance
     let totalDistance = 0;
-    route.legs.forEach((leg: any) => totalDistance += leg.distanceMeters);
+    totalDistance = route.distanceMeters;
     alert("Total distance: " + (totalDistance / 1000).toFixed(2) + " km");
 
   } catch (err) {
     console.error("Routes API error:", err);
   }
+}
+
+function getRouteElevation(path: google.maps.LatLng[]): void {
+  elevationService.getElevationAlongPath(
+    {
+      path,
+      samples: 256,
+    },
+    (results, status) => {
+      if (status !== google.maps.ElevationStatus.OK || !results) {
+        console.error("Elevation service failed:", status);
+        return;
+      }
+
+      let totalGain = 0;
+
+      for (let i = 1; i < results.length; i++) {
+        const diff = results[i].elevation - results[i - 1].elevation;
+        totalGain += diff;
+      }
+
+      // console.log("Elevation samples:", results);
+      console.log("Elevation gain (m):", totalGain.toFixed(1));
+
+      alert(
+        `Elevation gain: ${totalGain.toFixed(1)} m`
+      );
+
+      return totalGain;
+    }
+  );
 }

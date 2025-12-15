@@ -48,7 +48,7 @@ class Route(db.Model):
     coord_string: Mapped[str] = mapped_column(nullable=False)
     #Storing images in a database is not a good idea as they take up a lot of space.
     #Instead image_name stores the id of the route, and the image will be saved in route_images.
-    #That way when the image is needed it can be fetched from that directory by that name. 
+    #That way when the image is needed it can be fetched from that directory by that name.
     image_name: Mapped[str] = mapped_column(nullable=False)
 
 class UserRoutes(db.Model):
