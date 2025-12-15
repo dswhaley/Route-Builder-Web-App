@@ -1,6 +1,6 @@
 from typing import Sequence, Tuple
 from sqlalchemy import Row, Select
-from flask import  render_template, redirect, url_for, current_app, jsonify
+from flask import  render_template, redirect, request, url_for, current_app, jsonify
 from flask_login import login_required, current_user
 from flask import redirect, url_for, render_template, flash
 from app.auth.models import User, UserSchema
@@ -121,6 +121,18 @@ def go_home():
 def create_route():
     google_key = os.getenv("GOOGLE_MAPS_API_KEY")
     return render_template('create_route.html', GOOGLE_MAPS_API_KEY=google_key)
+
+@bp.route("/routes")
+@login_required
+def add_route_to_db():
+    response = request.json
+        
+    route = Route(distance=response.distance, elevation=response.elevation, route_name=response.route_name, coord_string=response.coord_string, image_name=response.image_name) # type: ignore[call-arg]
+    db.session.add(route)
+    db.session.commit()
+
+    return ""
+    
 
 
 
