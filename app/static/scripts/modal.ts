@@ -27,7 +27,7 @@ async function activateModal(event: MouseEvent){
   
     const modal = <HTMLInputElement> document.getElementById("create-activity-modal");
     const modalInputsDiv = <HTMLElement> document.getElementById("modal-inputs");
-
+    
     const routesResponse = await fetch("/routes_json");
 
     console.log(routesResponse);
@@ -134,6 +134,7 @@ async function createActivity(){
                 user_id: currentUser,
                 route_id: rid,
                 title: title,
+                type: type,
                 start_time: time,
                 duration: duration,
                 distance: distance
@@ -142,6 +143,7 @@ async function createActivity(){
             body = JSON.stringify({
                 user_id: currentUser,
                 title: title,
+                type: type,
                 start_time: time,
                 duration: duration,
                 distance: distance

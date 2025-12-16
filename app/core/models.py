@@ -10,8 +10,8 @@ from marshmallow import fields as ma_fields
 
 
 from marshmallow_sqlalchemy import fields as ma_sql_fields
-from app import db, ma
 from app.auth.models import User, UserSchema
+from app import db
 
 ############################### #################################################
 # Core Database Model Classes
@@ -68,8 +68,8 @@ class UserRoutes(db.Model):
 ################################################################################
 
 def init_app_db():
-    # db.drop_all()
-    # db.create_all()
+    db.drop_all()
+    db.create_all()
 
     # --- USERS ---
     users = [
@@ -81,8 +81,8 @@ def init_app_db():
     users[1].password = "password"
     users[2].password = "password"
 
-    # db.session.add_all(users)
-    # db.session.commit()
+    db.session.add_all(users)
+    db.session.commit()
 
     # --- ROUTES ---
     routes = [
@@ -90,8 +90,8 @@ def init_app_db():
         Route(route_name="Route 2", distance=10.0, elevation=50, coord_string = "", image_name="2.png"),  # type: ignore[call-arg]
         Route(route_name="Route 3", distance=15.0, elevation=100, coord_string = "", image_name="3.png"), # type: ignore[call-arg]
     ]
-    # db.session.add_all(routes)
-    # db.session.commit()
+    db.session.add_all(routes)
+    db.session.commit()
 
     # --- ACTIVITIES ---
     activities = [
@@ -111,11 +111,11 @@ def init_app_db():
     UserRoutes(uid=2, rid=3),   # type: ignore[call-arg]
     ]
 
-    # db.session.add_all(user_routes)
-    # db.session.commit()
+    db.session.add_all(user_routes)
+    db.session.commit()
     
-    # db.session.add_all(activities)
-    # db.session.commit()
+    db.session.add_all(activities)
+    db.session.commit()
 
 ################################################################################
 # API JSON Schemas

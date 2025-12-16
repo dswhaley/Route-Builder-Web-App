@@ -4,7 +4,7 @@ from flask import  render_template, redirect, request, url_for, current_app, jso
 from flask_login import login_required, current_user
 from flask import redirect, url_for, render_template, flash
 from app.auth.models import User, UserSchema
-
+from datetime import datetime
 from app import db
 from app.core import bp
 from app.core.forms import ActivityForm
@@ -148,15 +148,30 @@ def add_route_to_db():
 def post_activity():
     data = request.json #type: ignore
 
+    print("--- RECEIVED DATA START ---")
+    print(data)
+    print("--- RECEIVED DATA END ---")
+
+
     if data is None or not isinstance(data, dict):
             return abort(400)
 
+    start_time_obj = datetime.strptime(data['start_time'], '%Y-%m-%dT%H:%M')
+    duration_int = int(data['duration'])
+    distance_float = float(data['distance'])
+    user_id = int(data['user_id'])
+
+    if data['type'] == 'Run':
+        actType = Type.RUN
+    else:
+        actType = Type.RIDE
     activity_args = {
-        'user_id': data['user_id'],
+        'user_id': user_id, 
         'title': data['title'],
-        'start_time': data['start_time'],
-        'duration': data['duration'],
-        'distance': data['distance']
+        'type': actType,
+        'start_time': start_time_obj, 
+        'duration_minute': duration_int, 
+        'distance': distance_float
     }
 
     if data.get('route_id') and data.get('route_id') != '0':
