@@ -37,8 +37,11 @@
         <option> Everyone's Activities</option>
     </select> -->
 </div>
+<div hidden id = "currentUser"> {{user.id}}
+ </div>
 
-
+ <div hidden id = "isAdmin"> {% if user.admin %} 1 {%else%}
+0 {%endif%} </div>
 <!-- Page content -->
 
 <div class = "box">

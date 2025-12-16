@@ -19,6 +19,10 @@ async function addMore() {
     }
 }
 function helper(n, a) {
+    const id = document.getElementById("currentUser");
+    const numId = Number(id.innerText);
+    const admin = document.getElementById("isAdmin");
+    const numAdmin = Number(admin.innerText);
     n.classList.add("col-sm-12");
     n.classList.add("col-md-6");
     n.classList.add("col-lg-6");
@@ -33,7 +37,7 @@ function helper(n, a) {
     b.appendChild(c);
     let d = document.createElement("div");
     d.classList.add("card-header");
-    d.innerText = a.user_id + "'s " + a.title;
+    d.innerText = a.username + "'s " + a.title;
     c.appendChild(d);
     let y = document.createElement("div");
     y.classList.add("card-body");
@@ -53,11 +57,13 @@ function helper(n, a) {
         e.id = "routePic";
         y.appendChild(e);
     }
-    let f = document.createElement("button");
-    f.id = a.aid.toString();
-    f.innerText = "Delete Activity";
-    f.onclick = () => { deleteActivity(a.aid); };
-    y.appendChild(f);
+    if (numId === a.user_id || numAdmin === 1) {
+        let f = document.createElement("button");
+        f.id = a.aid.toString();
+        f.innerText = "Delete Activity";
+        f.onclick = () => { deleteActivity(a.aid); };
+        y.appendChild(f);
+    }
     return n;
 }
 async function deleteActivity(aid) {
