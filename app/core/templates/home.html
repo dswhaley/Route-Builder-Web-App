@@ -10,7 +10,8 @@
       integrity="sha384-HwwvtgBNo3bZJJLYd8oVXjrBZt8cqVSpeBNS5n7C8IVInixGAoxmnlMuBnhbgrkm" 
       crossorigin="anonymous"></script>
 <script src="/static/scripts/homepage_manager.js" defer></script>
-<script src="/static/scripts/doomScroll.js"></script>  
+<script type="module" src="/static/scripts/doomScroll.js"></script>  
+<script type="module" src="/static/scripts/modal.js"></script>  
 <script src="/static/scripts/resizeTopNav.js"></script>   
 <link rel="stylesheet" href="/static/styles/home.css">
 <link rel="stylesheet" href="/static/styles/topNav.css">
@@ -41,7 +42,7 @@
 
 <!-- Page content -->
 
-<div class = "box">
+<div class = "box" id = "box">
 <div class = "row align-items-center justify-content-left" id = "row">
 <!--         
         {%for activity in activities%}

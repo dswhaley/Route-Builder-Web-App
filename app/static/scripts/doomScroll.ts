@@ -27,7 +27,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     
 });
 
-async function addMore(){
+export async function addMore(){
     const url = "/activity_json";//create a route that returns the activities
     const newActivities = await fetch(url);
     const response = await vJSON(newActivities);
