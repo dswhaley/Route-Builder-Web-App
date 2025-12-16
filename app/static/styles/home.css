@@ -41,9 +41,22 @@ body{
 }
 
 #routePic{
+    margin-top: 1%;
     width: 80%;
 }
 #currentUser{
     display: hidden;
+}
+.gcc-btn-primary {
+    margin-top: 1%;
+    color: rgb(185, 225, 238);
+    background-color: rgb(81, 120, 81);
+    border-color: rgb(81, 120, 81);
+}
+
+.gcc-btn-primary:hover {
+    background-color: rgb(9, 1, 103);
+    border-color: rgb(185, 225, 238);
+    color: rgb(81, 120, 81);
 }
 

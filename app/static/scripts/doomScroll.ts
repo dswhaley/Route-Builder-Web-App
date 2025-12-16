@@ -77,6 +77,8 @@ function helper(n : HTMLDivElement, a: ActivityAPI.Activity){
     }
     if(numId === a.user_id || numAdmin === 1){
     let f = document.createElement("button");
+    f.classList.add("btn");
+    f.classList.add("gcc-btn-primary");
     f.id = a.aid.toString();
     f.innerText = "Delete Activity"
     f.onclick = () => {deleteActivity(a.aid)};

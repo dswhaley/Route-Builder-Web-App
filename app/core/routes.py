@@ -221,7 +221,7 @@ def save_route_image():
 
     return jsonify({
         "ok": True,
-        "image_path": f"/static/route_images/{image_name}"
+        "image_path": image_name
     }), 201
 
 

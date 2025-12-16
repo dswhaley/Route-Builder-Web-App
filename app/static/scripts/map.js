@@ -53,7 +53,7 @@ document.addEventListener("DOMContentLoaded", () => {
             coord_string: lastEncodedPolyline,
             image_name: imagePath
         };
-        const message = await fetch("http://127.0.0.1:5000/add_route/", {
+        const message = await fetch("/add_route/", {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
@@ -65,6 +65,7 @@ document.addEventListener("DOMContentLoaded", () => {
             throw new Error(`Flask error: ${err}`);
         }
         console.log(message);
+        window.location.href = "/home/";
     }
     function handleEraseClick(event) {
         console.log('Erase Button was clicked!');
