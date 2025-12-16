@@ -40,11 +40,10 @@ document.addEventListener("DOMContentLoaded", () => {
         send_route_to_db();
     }
     async function send_route_to_db() {
-        const routeName = document.getElementById("routeName");
         const routeData = {
             distance: totalDistance,
             elevation: elevation,
-            route_name: routeName.value,
+            route_name: "TEST",
             coord_string: lastEncodedPolyline,
             image_name: "1.png"
         };
@@ -63,6 +62,7 @@ document.addEventListener("DOMContentLoaded", () => {
     }
     function handleEraseClick(event) {
         console.log('Erase Button was clicked!');
+        routeFinalized = false;
         markers.forEach(marker => {
             marker.map = null;
         });

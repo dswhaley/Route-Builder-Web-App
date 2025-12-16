@@ -17,7 +17,6 @@ document.addEventListener("DOMContentLoaded", () => {
   eraseBtn.addEventListener('click', handleEraseClick);
 
 
-
   async function handleCreateClick(event: MouseEvent): Promise<void> {
   event.preventDefault();
 
@@ -51,18 +50,16 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   const imgData = await imgRes.json();
-  
+
   // Send everything to backend
   send_route_to_db();
 }
 
   async function send_route_to_db() {
-
-    const routeName = <HTMLInputElement> document.getElementById("routeName");
     const routeData = {
       distance: totalDistance,
       elevation: elevation,
-      route_name: routeName.value,
+      route_name: "TEST",
       coord_string: lastEncodedPolyline,
       image_name: "1.png"
     }
@@ -85,6 +82,8 @@ document.addEventListener("DOMContentLoaded", () => {
 
   function handleEraseClick(event: MouseEvent): void {
     console.log('Erase Button was clicked!');
+
+    routeFinalized = false;
 
     markers.forEach(marker => {
       marker.map = null;
