@@ -82,7 +82,7 @@ async function createActivity() {
         canPost = false;
     }
     const distanceElement = document.getElementById("distance");
-    const distance = durationElement.value;
+    const distance = distanceElement.value;
     if (!distance) {
         alert("Distance Required");
         canPost = false;
@@ -120,6 +120,7 @@ async function createActivity() {
         const activity = await validateJSON(response);
         alert("Activity was created");
         reloadActivities();
+        clearActivityForm();
     }
 }
 function reloadActivities() {
