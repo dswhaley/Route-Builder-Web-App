@@ -95,7 +95,7 @@ async function createActivity(){
         alert("Title");
     }
 
-    const typeElement = <HTMLInputElement>document.getElementById("element");
+    const typeElement = <HTMLInputElement> document.getElementById("type");
     const type = typeElement.value;
     if(!type){
         alert("Activity Type Required");

@@ -17,6 +17,7 @@ body {
   background-color: rgb(81, 120, 81);
 }
  #map {
+      margin-top: 1%;
       height: 70vh;
       width: 100%;
 }
@@ -24,3 +25,23 @@ body {
 a {
 text-decoration: none; /* Removes underline */
 }
+
+.gcc-btn-primary {
+    color: rgb(81, 120, 81);
+    background-color: rgb(185, 225, 238);
+    border-color: rgb(81, 120, 81);
+}
+
+.gcc-btn-primary:hover {
+    background-color: rgb(9, 1, 103);
+    border-color: rgb(185, 225, 238);
+    color: rgb(81, 120, 81);
+}
+#endOfPage{
+  margin-top: 1%;
+}
+
+#routeText{
+  color:rgb(185, 225, 238);
+}
+

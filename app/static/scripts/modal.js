@@ -61,7 +61,7 @@ async function createActivity() {
     if (!title) {
         alert("Title");
     }
-    const typeElement = document.getElementById("element");
+    const typeElement = document.getElementById("type");
     const type = typeElement.value;
     if (!type) {
         alert("Activity Type Required");

@@ -20,18 +20,18 @@ from .getFromDB import get_activities_by_date, get_user_activity, get_users_rout
 
 load_dotenv()
 
-@bp.get("/create_activity/")
-@login_required
-def add_activity_form():
-    form = ActivityForm()
+# @bp.get("/create_activity/")
+# @login_required
+# def add_activity_form():
+#     form = ActivityForm()
 
-    user_route_links = UserRoutes.query.filter_by(uid=current_user.id).all()
-    user_route_ids = [ur.rid for ur in user_route_links]
-    routes = Route.query.filter(Route.rid.in_(user_route_ids)).all()
+#     user_route_links = UserRoutes.query.filter_by(uid=current_user.id).all()
+#     user_route_ids = [ur.rid for ur in user_route_links]
+#     routes = Route.query.filter(Route.rid.in_(user_route_ids)).all()
 
-    form.route.choices = [('', '-- None --')] + [(str(r.rid), r.route_name) for r in routes]    # type: ignore[assignment]
+#     form.route.choices = [('', '-- None --')] + [(str(r.rid), r.route_name) for r in routes]    # type: ignore[assignment]
 
-    return render_template("activity.html", form=form, routes=routes)
+#     return render_template("activity.html", form=form, routes=routes)
 
 @bp.get("/my_activities/<int:id>/")
 @login_required
@@ -144,7 +144,7 @@ def add_route_to_db():
 
     return ""
 
-@bp.post('/create_activity')#type: ignore 
+@bp.post('/create_activity/')#type: ignore 
 def post_activity():
     data = request.json #type: ignore
 
@@ -170,6 +170,9 @@ def post_activity():
     schema = ActivitySchema()
     return schema.dump(activity, many=False), 201
 
+@bp.get('/create_activity/')
+def get_activity():
+    return ''
 
 @bp.post("/save_route_image/")
 @login_required
