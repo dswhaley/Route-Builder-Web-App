@@ -8,6 +8,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     createButton.addEventListener("click", createActivity);
 });
 async function activateModal(event) {
+    clearActivityForm();
     const modal = document.getElementById("create-activity-modal");
     const modalInputsDiv = document.getElementById("modal-inputs");
     const routesResponse = await fetch("/routes_json");
@@ -38,11 +39,12 @@ async function handleRouteSelection(event) {
     else {
         const routeResponse = await fetch(`/routes_json/${routeId}`);
         const route = await validateJSON(routeResponse);
-        const routeDistance = route.distance;
-        console.log(`Route Distance: ${routeDistance}`);
+        const routeDistanceMeters = route.distance;
+        const routeDistanceMiles = routeDistanceMeters / 1609.34;
+        console.log(`Route Distance: ${routeDistanceMiles}`);
         if (route) {
             distanceField.disabled = true;
-            distanceField.value = routeDistance.toString();
+            distanceField.value = routeDistanceMiles.toFixed(2);
         }
     }
 }
@@ -80,7 +82,7 @@ async function createActivity() {
         canPost = false;
     }
     const distanceElement = document.getElementById("distance");
-    const distance = durationElement.value;
+    const distance = distanceElement.value;
     if (!distance) {
         alert("Distance Required");
         canPost = false;
@@ -118,6 +120,7 @@ async function createActivity() {
         const activity = await validateJSON(response);
         alert("Activity was created");
         reloadActivities();
+        clearActivityForm();
     }
 }
 function reloadActivities() {
@@ -137,4 +140,13 @@ function validateJSON(response) {
     else {
         return Promise.reject(response);
     }
+}
+function clearActivityForm() {
+    document.getElementById("title").value = "";
+    document.getElementById("type").value = "";
+    document.getElementById("start-time").value = "";
+    document.getElementById("duration").value = "";
+    document.getElementById("distance").value = "";
+    document.getElementById("routes").value = "0";
+    document.getElementById("distance").disabled = false;
 }

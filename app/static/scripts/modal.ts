@@ -24,7 +24,8 @@ document.addEventListener("DOMContentLoaded", async () => {
 });
 
 async function activateModal(event: MouseEvent){
-  
+    clearActivityForm();
+
     const modal = <HTMLInputElement> document.getElementById("create-activity-modal");
     const modalInputsDiv = <HTMLElement> document.getElementById("modal-inputs");
     
@@ -65,12 +66,13 @@ async function handleRouteSelection(event: Event){
         const routeResponse =  await fetch(`/routes_json/${routeId}`);
         const route = <RouteManager.Route> await validateJSON(routeResponse);
 
-        const routeDistance = route.distance;
+        const routeDistanceMeters = route.distance;
+        const routeDistanceMiles = routeDistanceMeters / 1609.34;
 
-        console.log(`Route Distance: ${routeDistance}`);
+        console.log(`Route Distance: ${routeDistanceMiles}`);
         if (route){
             distanceField.disabled = true; 
-            distanceField.value = routeDistance.toString();
+            distanceField.value = routeDistanceMiles.toFixed(2);
         }
     }
 }
@@ -120,7 +122,7 @@ async function createActivity(){
     }
 
     const distanceElement = <HTMLInputElement> document.getElementById("distance");
-    const distance = durationElement.value;
+    const distance = distanceElement.value;
 
     if(!distance){
         alert("Distance Required");
@@ -162,7 +164,7 @@ async function createActivity(){
 
         alert("Activity was created")
         reloadActivities();
-
+        clearActivityForm();
     }   
 
 }
@@ -186,4 +188,14 @@ function validateJSON(response: Response) {
     } else {
         return Promise.reject(response);
     }
+}
+
+function clearActivityForm() {
+    (document.getElementById("title") as HTMLInputElement).value = "";
+    (document.getElementById("type") as HTMLInputElement).value = "";
+    (document.getElementById("start-time") as HTMLInputElement).value = "";
+    (document.getElementById("duration") as HTMLInputElement).value = "";
+    (document.getElementById("distance") as HTMLInputElement).value = "";
+    (document.getElementById("routes") as HTMLSelectElement).value = "0";
+    (document.getElementById("distance") as HTMLInputElement).disabled = false;
 }
