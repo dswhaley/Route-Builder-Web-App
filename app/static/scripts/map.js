@@ -113,9 +113,7 @@ async function calculateRoute(fitAndCapture = false) {
             const bounds = new google.maps.LatLngBounds();
             decodedPath.forEach(p => bounds.extend(p));
             map.fitBounds(bounds);
-            google.maps.event.addListenerOnce(map, "idle", () => {
-                captureMapImage();
-            });
+            downloadStaticRouteImage(route.polyline.encodedPolyline);
         }
         const elevation = getRouteElevation(decodedPath);
         let totalDistance = 0;
@@ -145,28 +143,13 @@ function getRouteElevation(path) {
         return totalGain;
     });
 }
-async function captureMapImage() {
-    const mapDiv = document.getElementById("map");
-    if (!mapDiv) {
-        console.error("Map div not found");
-        return;
-    }
-    try {
-        const canvas = await html2canvas(mapDiv, {
-            useCORS: true,
-            scale: 2,
-            backgroundColor: null
-        });
-        const imageData = canvas.toDataURL("image/png");
-        downloadImage(imageData);
-    }
-    catch (err) {
-        console.error("Screenshot failed:", err);
-    }
-}
-function downloadImage(dataUrl) {
+function downloadStaticRouteImage(encodedPolyline) {
+    const url = `https://maps.googleapis.com/maps/api/staticmap` +
+        `?size=1200x800` +
+        `&path=weight:5|color:0x4285F4|enc:${encodedPolyline}` +
+        `&key=YOUR_API_KEY`;
     const link = document.createElement("a");
-    link.href = dataUrl;
+    link.href = url;
     link.download = "route.png";
     link.click();
 }

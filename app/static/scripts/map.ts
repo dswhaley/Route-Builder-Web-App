@@ -1,8 +1,3 @@
-declare const html2canvas: (
-  element: HTMLElement,
-  options?: any
-) => Promise<HTMLCanvasElement>;
-
 let map: google.maps.Map;
 let markers: google.maps.marker.AdvancedMarkerElement[] = [];
 let routePolyline: google.maps.Polyline;
@@ -152,10 +147,7 @@ async function calculateRoute(fitAndCapture = false): Promise<void> {
       const bounds = new google.maps.LatLngBounds();
       decodedPath.forEach(p=> bounds.extend(p));
       map.fitBounds(bounds);
-      
-      google.maps.event.addListenerOnce(map, "idle", () => {
-        captureMapImage();
-      });
+      downloadStaticRouteImage(route.polyline.encodedPolyline);
     }
 
     const elevation = getRouteElevation(decodedPath);
@@ -224,33 +216,15 @@ function getRouteElevation(path: google.maps.LatLng[]): void {
   );
 }
 
-async function captureMapImage(): Promise<void> {
-  const mapDiv = document.getElementById("map");
-  if (!mapDiv) {
-    console.error("Map div not found");
-    return;
-  }
+function downloadStaticRouteImage(encodedPolyline: string): void {
+  const url =
+    `https://maps.googleapis.com/maps/api/staticmap` +
+    `?size=1200x800` +
+    `&path=weight:5|color:0x4285F4|enc:${encodedPolyline}` +
+    `&key=YOUR_API_KEY`; // or fetch from backend
 
-  try {
-    const canvas = await html2canvas(mapDiv, {
-      useCORS: true,
-      scale: 2,               // higher-res export
-      backgroundColor: null
-    });
-
-    const imageData = canvas.toDataURL("image/png");
-
-    // For now: download locally
-    downloadImage(imageData);
-
-  } catch (err) {
-    console.error("Screenshot failed:", err);
-  }
-}
-
-function downloadImage(dataUrl: string): void {
   const link = document.createElement("a");
-  link.href = dataUrl;
+  link.href = url;
   link.download = "route.png";
   link.click();
 }
