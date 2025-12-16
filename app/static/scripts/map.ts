@@ -2,6 +2,7 @@ let map: google.maps.Map;
 let markers: google.maps.marker.AdvancedMarkerElement[] = [];
 let routePolyline: google.maps.Polyline;
 let elevationService: google.maps.ElevationService;
+let routeFinalized = false;
 
 const apiUrl = 'http://localhost:5000/api';
 
@@ -14,13 +15,17 @@ document.addEventListener("DOMContentLoaded", () => {
 
 
   function handleCreateClick(event: MouseEvent): void {
-    console.log('Button was clicked!');
-    const output = document.getElementById('outputArea');
-    if (output) {
-      output.textContent = 'Button clicked at ' + new Date().toLocaleTimeString();
-    }
-    // Optional: prevent default behavior if the button is part of a form
     event.preventDefault();
+
+    if (markers.length < 2) {
+      alert("Add at least two points to create a route.");
+      return;
+    }
+
+    routeFinalized = true;
+
+    // Calculate route one final time
+    calculateRoute(true);
   }
 
   function handleEraseClick(event: MouseEvent): void {
