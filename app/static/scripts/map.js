@@ -2,6 +2,7 @@ let map;
 let markers = [];
 let routePolyline;
 let elevationService;
+let routeFinalized = false;
 const apiUrl = 'http://localhost:5000/api';
 document.addEventListener("DOMContentLoaded", () => {
     const createBtn = document.getElementById('createBtn');
@@ -9,12 +10,13 @@ document.addEventListener("DOMContentLoaded", () => {
     const eraseBtn = document.getElementById('eraseBtn');
     eraseBtn.addEventListener('click', handleEraseClick);
     function handleCreateClick(event) {
-        console.log('Button was clicked!');
-        const output = document.getElementById('outputArea');
-        if (output) {
-            output.textContent = 'Button clicked at ' + new Date().toLocaleTimeString();
-        }
         event.preventDefault();
+        if (markers.length < 2) {
+            alert("Add at least two points to create a route.");
+            return;
+        }
+        routeFinalized = true;
+        calculateRoute(true);
     }
     function handleEraseClick(event) {
         console.log('Erase Button was clicked!');
@@ -57,6 +59,8 @@ async function fetchApiKey() {
     }
 }
 function addMarker(location) {
+    if (routeFinalized)
+        return;
     const marker = new google.maps.marker.AdvancedMarkerElement({
         position: location,
         map: map,
@@ -65,7 +69,7 @@ function addMarker(location) {
     if (markers.length >= 2)
         calculateRoute();
 }
-async function calculateRoute() {
+async function calculateRoute(fitAndCapture = false) {
     if (markers.length < 2)
         return;
     function toRoutesLatLng(position) {
@@ -105,6 +109,14 @@ async function calculateRoute() {
         }
         const decodedPath = google.maps.geometry.encoding.decodePath(route.polyline.encodedPolyline);
         routePolyline.setPath(decodedPath);
+        if (fitAndCapture) {
+            const bounds = new google.maps.LatLngBounds();
+            decodedPath.forEach(p => bounds.extend(p));
+            map.fitBounds(bounds);
+            google.maps.event.addListenerOnce(map, "idle", () => {
+                captureMapImage();
+            });
+        }
         const elevation = getRouteElevation(decodedPath);
         let totalDistance = 0;
         totalDistance = route.distanceMeters;
@@ -132,4 +144,29 @@ function getRouteElevation(path) {
         alert(`Elevation gain: ${totalGain.toFixed(1)} m`);
         return totalGain;
     });
+}
+async function captureMapImage() {
+    const mapDiv = document.getElementById("map");
+    if (!mapDiv) {
+        console.error("Map div not found");
+        return;
+    }
+    try {
+        const canvas = await html2canvas(mapDiv, {
+            useCORS: true,
+            scale: 2,
+            backgroundColor: null
+        });
+        const imageData = canvas.toDataURL("image/png");
+        downloadImage(imageData);
+    }
+    catch (err) {
+        console.error("Screenshot failed:", err);
+    }
+}
+function downloadImage(dataUrl) {
+    const link = document.createElement("a");
+    link.href = dataUrl;
+    link.download = "route.png";
+    link.click();
 }
