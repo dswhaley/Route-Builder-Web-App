@@ -1,8 +1,4 @@
-var ActivityAPI;
-(function (ActivityAPI) {
-})(ActivityAPI || (ActivityAPI = {}));
 document.addEventListener("DOMContentLoaded", async () => {
-    console.log("begining");
     addMore();
 });
 async function addMore() {
