@@ -108,11 +108,12 @@ def get_profile():
 
 @bp.get("/")
 @bp.get("/home/")
+@login_required
 def go_home():
     home_activities = get_activities_by_date()
     return render_template("home.html", activities = home_activities, user=current_user)
 # @bp.get('/')
-# @login_required
+# 
 # def index():
 #     return redirect(url_for('core.get_accounts'))
 

@@ -19,6 +19,13 @@
     padding-left: 1rem;
     padding-right: 1rem;
 }
+#signupbtn {
+    display: block;
+    margin: auto;
+    margin-top: 2rem;
+    padding-left: 1rem;
+    padding-right: 1rem;
+}
 
 #error-messages {
     width: 50vw;
@@ -27,4 +34,7 @@
     margin: auto;
     margin-top: 1rem;
     margin-bottom: 1rem;
+}
+a {
+text-decoration: none; 
 }

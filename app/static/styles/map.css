@@ -19,4 +19,8 @@ body {
  #map {
       height: 70vh;
       width: 100%;
-    }
+}
+
+a {
+text-decoration: none; /* Removes underline */
+}
