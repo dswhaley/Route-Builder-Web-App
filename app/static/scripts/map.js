@@ -4,6 +4,8 @@ let routePolyline;
 let elevationService;
 let totalDistance;
 let elevation;
+let routeFinalized = false;
+let lastEncodedPolyline = null;
 const apiUrl = 'http://localhost:5000/api';
 document.addEventListener("DOMContentLoaded", () => {
     const createBtn = document.getElementById('createBtn');
@@ -11,16 +13,22 @@ document.addEventListener("DOMContentLoaded", () => {
     const eraseBtn = document.getElementById('eraseBtn');
     eraseBtn.addEventListener('click', handleEraseClick);
     function handleCreateClick(event) {
-        console.log('Button was clicked!');
-        do_the_thing();
+        event.preventDefault();
+        if (markers.length < 2) {
+            alert("Add at least two points first.");
+            return;
+        }
+        routeFinalized = true;
+        downloadStaticRouteImage(lastEncodedPolyline);
+        send_route_to_db();
     }
-    async function do_the_thing() {
+    async function send_route_to_db() {
         const routeData = {
             distance: totalDistance,
             elevation: elevation,
             route_name: "TEST",
-            coord_string: "",
-            image_name: ""
+            coord_string: lastEncodedPolyline,
+            image_name: "1.png"
         };
         const message = await fetch("http://127.0.0.1:5000/add_route/", {
             method: "POST",
@@ -120,6 +128,7 @@ async function calculateRoute(fitAndCapture = false) {
             return;
         }
         const route = data.routes[0];
+        lastEncodedPolyline = route.polyline.encodedPolyline;
         if (!route.polyline || !route.polyline.encodedPolyline) {
             console.error("No polyline returned", route);
             return;
@@ -128,6 +137,11 @@ async function calculateRoute(fitAndCapture = false) {
         routePolyline.setPath(decodedPath);
         elevation = await getRouteElevation(decodedPath);
         totalDistance = route.distanceMeters;
+        if (fitAndCapture) {
+            const bounds = new google.maps.LatLngBounds();
+            decodedPath.forEach(p => bounds.extend(p));
+            map.fitBounds(bounds);
+        }
     }
     catch (err) {
         console.error("Routes API error:", err);
@@ -149,4 +163,22 @@ function getRouteElevation(path) {
             resolve(totalGain);
         });
     });
+}
+async function downloadStaticRouteImage(encodedPolyline) {
+    const googleApiKey = await fetchApiKey();
+    const start = markers[0].position;
+    const end = markers[markers.length - 1].position;
+    const baseUrl = "https://maps.googleapis.com/maps/api/staticmap";
+    const params = [
+        "size=1200x800",
+        `markers=color:green|label:S|${start.lat},${start.lng}`,
+        `markers=color:red|label:E|${end.lat},${end.lng}`,
+        `path=weight:5|color:0x0033AA|enc:${encodedPolyline}`,
+        `key=${googleApiKey}`
+    ];
+    const url = `${baseUrl}?${params.join("&")}`;
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = "route.png";
+    link.click();
 }

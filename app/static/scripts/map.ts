@@ -5,6 +5,7 @@ let elevationService: google.maps.ElevationService;
 let totalDistance: number;
 let elevation: number;
 let routeFinalized = false;
+let lastEncodedPolyline: string | null = null;
 
 const apiUrl = 'http://localhost:5000/api';
 
@@ -16,19 +17,29 @@ document.addEventListener("DOMContentLoaded", () => {
   eraseBtn.addEventListener('click', handleEraseClick);
 
 
-  function handleCreateClick(event: MouseEvent): void {
-    console.log('Button was clicked!');
+  function handleCreateClick(event: MouseEvent): Promise<void> {
+  event.preventDefault();
 
-    send_route_to_db()
-
+  if (markers.length < 2) {
+    alert("Add at least two points first.");
+    return;
   }
+
+  routeFinalized = true;
+
+  // Generate static image
+  downloadStaticRouteImage(lastEncodedPolyline);
+
+  // Send everything to backend
+  send_route_to_db();
+}
 
   async function send_route_to_db() {
     const routeData = {
       distance: totalDistance,
       elevation: elevation,
       route_name: "TEST",
-      coord_string: "",
+      coord_string: lastEncodedPolyline,
       image_name: "1.png"
     }
 
@@ -153,6 +164,7 @@ async function calculateRoute(fitAndCapture = false): Promise<void> {
     }
 
     const route = data.routes[0];
+    lastEncodedPolyline = route.polyline.encodedPolyline;
 
     // Draw polyline using geometry.polyline
     if (!route.polyline || !route.polyline.encodedPolyline) {
@@ -169,6 +181,12 @@ async function calculateRoute(fitAndCapture = false): Promise<void> {
     // Total distance
     totalDistance = route.distanceMeters;
     // alert("Total distance: " + (totalDistance / 1000).toFixed(2) + " km");
+
+    if (fitAndCapture) {
+      const bounds = new google.maps.LatLngBounds();
+      decodedPath.forEach(p => bounds.extend(p));
+      map.fitBounds(bounds);
+    }
 
   } catch (err) {
     console.error("Routes API error:", err);
@@ -196,4 +214,32 @@ function getRouteElevation(path: google.maps.LatLng[]): Promise<number> {
       }
     );
   });
+}
+
+async function downloadStaticRouteImage(encodedPolyline: string): Promise<void> {
+  const googleApiKey = await fetchApiKey();
+
+  const start = markers[0].position as google.maps.LatLngLiteral;
+  const end = markers[markers.length - 1].position as google.maps.LatLngLiteral;
+
+  const baseUrl = "https://maps.googleapis.com/maps/api/staticmap";
+
+  const params = [
+    "size=1200x800",
+
+    `markers=color:green|label:S|${start.lat},${start.lng}`,
+    
+    `markers=color:red|label:E|${end.lat},${end.lng}`,
+
+    `path=weight:5|color:0x0033AA|enc:${encodedPolyline}`,
+
+    `key=${googleApiKey}`
+  ];
+
+  const url = `${baseUrl}?${params.join("&")}`;
+
+  const link = document.createElement("a");
+  link.href = url;
+  link.download = "route.png";
+  link.click();
 }
