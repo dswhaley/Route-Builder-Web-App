@@ -177,11 +177,14 @@ def save_route_image():
     data = request.get_json()
 
     image_url = data.get("image_url")
-    image_name = data.get("image_name", "route.png")
+    image_name = data.get("image_name")
 
     if not image_url:
         return jsonify({"error": "Missing image_url"}), 400
 
+    if not image_name:
+        image_name = "route.png"
+        
     # app/static/route_images
     save_dir = os.path.join(current_app.root_path, "static", "route_images")
     os.makedirs(save_dir, exist_ok=True)
