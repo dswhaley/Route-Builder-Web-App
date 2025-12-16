@@ -124,7 +124,7 @@ async function createActivity(){
     }
 
     const distanceElement = <HTMLInputElement> document.getElementById("distance");
-    const distance = durationElement.value;
+    const distance = distanceElement.value;
 
     if(!distance){
         alert("Distance Required");
