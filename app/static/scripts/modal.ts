@@ -160,6 +160,7 @@ async function createActivity(){
 
         const activity = await validateJSON(response);
 
+        alert("Activity was created")
         reloadActivities();
 
     }   

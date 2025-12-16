@@ -65,7 +65,7 @@ document.addEventListener("DOMContentLoaded", () => {
             throw new Error(`Flask error: ${err}`);
         }
         console.log(message);
-        window.location.href = "/home/";
+        alert("Added route");
     }
     function handleEraseClick(event) {
         console.log('Erase Button was clicked!');

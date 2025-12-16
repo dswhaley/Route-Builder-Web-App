@@ -116,6 +116,7 @@ async function createActivity() {
             body: body
         });
         const activity = await validateJSON(response);
+        alert("Activity was created");
         reloadActivities();
     }
 }
