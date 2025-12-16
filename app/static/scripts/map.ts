@@ -17,6 +17,7 @@ document.addEventListener("DOMContentLoaded", () => {
   eraseBtn.addEventListener('click', handleEraseClick);
 
 
+
   async function handleCreateClick(event: MouseEvent): Promise<void> {
   event.preventDefault();
 
@@ -56,10 +57,12 @@ document.addEventListener("DOMContentLoaded", () => {
 }
 
   async function send_route_to_db() {
+
+    const routeName = <HTMLInputElement> document.getElementById("routeName");
     const routeData = {
       distance: totalDistance,
       elevation: elevation,
-      route_name: "TEST",
+      route_name: routeName.value,
       coord_string: lastEncodedPolyline,
       image_name: "1.png"
     }

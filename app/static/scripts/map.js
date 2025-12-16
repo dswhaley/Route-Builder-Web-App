@@ -40,10 +40,11 @@ document.addEventListener("DOMContentLoaded", () => {
         send_route_to_db();
     }
     async function send_route_to_db() {
+        const routeName = document.getElementById("routeName");
         const routeData = {
             distance: totalDistance,
             elevation: elevation,
-            route_name: "TEST",
+            route_name: routeName.value,
             coord_string: lastEncodedPolyline,
             image_name: "1.png"
         };
