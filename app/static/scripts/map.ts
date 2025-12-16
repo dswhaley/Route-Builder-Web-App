@@ -1,4 +1,7 @@
-import html2canvas from "html2canvas";
+declare const html2canvas: (
+  element: HTMLElement,
+  options?: any
+) => Promise<HTMLCanvasElement>;
 
 let map: google.maps.Map;
 let markers: google.maps.marker.AdvancedMarkerElement[] = [];
