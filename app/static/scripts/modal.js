@@ -8,6 +8,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     createButton.addEventListener("click", createActivity);
 });
 async function activateModal(event) {
+    clearActivityForm();
     const modal = document.getElementById("create-activity-modal");
     const modalInputsDiv = document.getElementById("modal-inputs");
     const routesResponse = await fetch("/routes_json");
@@ -137,4 +138,13 @@ function validateJSON(response) {
     else {
         return Promise.reject(response);
     }
+}
+function clearActivityForm() {
+    document.getElementById("title").value = "";
+    document.getElementById("type").value = "";
+    document.getElementById("start-time").value = "";
+    document.getElementById("duration").value = "";
+    document.getElementById("distance").value = "";
+    document.getElementById("routes").value = "0";
+    document.getElementById("distance").disabled = false;
 }

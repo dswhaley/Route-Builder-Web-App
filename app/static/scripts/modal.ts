@@ -24,7 +24,8 @@ document.addEventListener("DOMContentLoaded", async () => {
 });
 
 async function activateModal(event: MouseEvent){
-  
+    clearActivityForm();
+    
     const modal = <HTMLInputElement> document.getElementById("create-activity-modal");
     const modalInputsDiv = <HTMLElement> document.getElementById("modal-inputs");
     
@@ -186,4 +187,14 @@ function validateJSON(response: Response) {
     } else {
         return Promise.reject(response);
     }
+}
+
+function clearActivityForm() {
+    (document.getElementById("title") as HTMLInputElement).value = "";
+    (document.getElementById("type") as HTMLInputElement).value = "";
+    (document.getElementById("start-time") as HTMLInputElement).value = "";
+    (document.getElementById("duration") as HTMLInputElement).value = "";
+    (document.getElementById("distance") as HTMLInputElement).value = "";
+    (document.getElementById("routes") as HTMLSelectElement).value = "0";
+    (document.getElementById("distance") as HTMLInputElement).disabled = false;
 }
