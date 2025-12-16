@@ -109,11 +109,12 @@ def get_profile():
 
 @bp.get("/")
 @bp.get("/home/")
+@login_required
 def go_home():
     home_activities = get_activities_by_date()
     return render_template("home.html", activities = home_activities, user=current_user)
 # @bp.get('/')
-# @login_required
+# 
 # def index():
 #     return redirect(url_for('core.get_accounts'))
 
@@ -179,11 +180,14 @@ def save_route_image():
     data = request.get_json()
 
     image_url = data.get("image_url")
-    image_name = data.get("image_name", "route.png")
+    image_name = data.get("image_name")
 
     if not image_url:
         return jsonify({"error": "Missing image_url"}), 400
 
+    if not image_name:
+        image_name = "route.png"
+        
     # app/static/route_images
     save_dir = os.path.join(current_app.root_path, "static", "route_images")
     os.makedirs(save_dir, exist_ok=True)
