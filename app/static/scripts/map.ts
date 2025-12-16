@@ -1,3 +1,5 @@
+import html2canvas from "html2canvas";
+
 let map: google.maps.Map;
 let markers: google.maps.marker.AdvancedMarkerElement[] = [];
 let routePolyline: google.maps.Polyline;
@@ -76,6 +78,8 @@ async function fetchApiKey(): Promise<string | null> {
 }
 
 function addMarker(location: google.maps.LatLng): void {
+  if (routeFinalized) return;
+
   // Create custom marker element
   const marker = new google.maps.marker.AdvancedMarkerElement({
     position: location,
@@ -87,7 +91,7 @@ function addMarker(location: google.maps.LatLng): void {
   if (markers.length >= 2) calculateRoute();
 }
 
-async function calculateRoute(): Promise<void> {
+async function calculateRoute(fitAndCapture = false): Promise<void> {
   if (markers.length < 2) return;
 
  function toRoutesLatLng(position: google.maps.LatLng | google.maps.LatLngLiteral) {
@@ -140,6 +144,16 @@ async function calculateRoute(): Promise<void> {
 
     const decodedPath = google.maps.geometry.encoding.decodePath(route.polyline.encodedPolyline);
     routePolyline.setPath(decodedPath);
+
+    if (fitAndCapture) {
+      const bounds = new google.maps.LatLngBounds();
+      decodedPath.forEach(p=> bounds.extend(p));
+      map.fitBounds(bounds);
+      
+      google.maps.event.addListenerOnce(map, "idle", () => {
+        captureMapImage();
+      });
+    }
 
     const elevation = getRouteElevation(decodedPath);
 
@@ -205,4 +219,35 @@ function getRouteElevation(path: google.maps.LatLng[]): void {
       return totalGain;
     }
   );
+}
+
+async function captureMapImage(): Promise<void> {
+  const mapDiv = document.getElementById("map");
+  if (!mapDiv) {
+    console.error("Map div not found");
+    return;
+  }
+
+  try {
+    const canvas = await html2canvas(mapDiv, {
+      useCORS: true,
+      scale: 2,               // higher-res export
+      backgroundColor: null
+    });
+
+    const imageData = canvas.toDataURL("image/png");
+
+    // For now: download locally
+    downloadImage(imageData);
+
+  } catch (err) {
+    console.error("Screenshot failed:", err);
+  }
+}
+
+function downloadImage(dataUrl: string): void {
+  const link = document.createElement("a");
+  link.href = dataUrl;
+  link.download = "route.png";
+  link.click();
 }
