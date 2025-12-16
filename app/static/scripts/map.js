@@ -35,7 +35,7 @@ document.addEventListener("DOMContentLoaded", () => {
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({
                 image_url: imageUrl,
-                image_name: "route_1.png"
+                image_name: `${routeName}.png`
             })
         });
         if (!imgRes.ok) {
