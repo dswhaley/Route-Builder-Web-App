@@ -20,6 +20,14 @@ document.addEventListener("DOMContentLoaded", () => {
   async function handleCreateClick(event: MouseEvent): Promise<void> {
   event.preventDefault();
 
+  const routeNameInput = document.getElementById("routeName") as HTMLInputElement;
+  const routeName = routeNameInput.value.trim();
+
+  if (!routeName) {
+    alert("Please enter a route name.");
+    return;
+  }
+
   if (markers.length < 2) {
     alert("Add at least two points first.");
     return;
@@ -52,17 +60,17 @@ document.addEventListener("DOMContentLoaded", () => {
   const imgData = await imgRes.json();
 
   // Send everything to backend
-  send_route_to_db();
-}
+  send_route_to_db(routeName, imgData.image_path);
+  }
 
-  async function send_route_to_db() {
+  async function send_route_to_db(routeName: string, imagePath: string) {
     const routeData = {
       distance: totalDistance,
       elevation: elevation,
-      route_name: "TEST",
+      route_name: routeName,
       coord_string: lastEncodedPolyline,
-      image_name: "1.png"
-    }
+      image_name: imagePath
+    };
 
     const message = await fetch("http://127.0.0.1:5000/add_route/", {
       method: "POST",
