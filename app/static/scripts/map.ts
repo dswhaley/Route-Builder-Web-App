@@ -2,41 +2,103 @@ let map: google.maps.Map;
 let markers: google.maps.marker.AdvancedMarkerElement[] = [];
 let routePolyline: google.maps.Polyline;
 let elevationService: google.maps.ElevationService;
+let totalDistance: number;
+let elevation: number;
 let routeFinalized = false;
+let lastEncodedPolyline: string | null = null;
 
 const apiUrl = 'http://localhost:5000/api';
 
 document.addEventListener("DOMContentLoaded", () => {
-  
+
   const createBtn = document.getElementById('createBtn');
   createBtn.addEventListener('click', handleCreateClick);
   const eraseBtn = document.getElementById('eraseBtn');
   eraseBtn.addEventListener('click', handleEraseClick);
 
 
-  function handleCreateClick(event: MouseEvent): void {
-    event.preventDefault();
+  async function handleCreateClick(event: MouseEvent): Promise<void> {
+  event.preventDefault();
 
-    if (markers.length < 2) {
-      alert("Add at least two points to create a route.");
-      return;
+  const routeNameInput = document.getElementById("routeName") as HTMLInputElement;
+  const routeName = routeNameInput.value.trim();
+
+  if (!routeName) {
+    alert("Please enter a route name.");
+    return;
+  }
+
+  if (markers.length < 2) {
+    alert("Add at least two points first.");
+    return;
+  }
+
+  routeFinalized = true;
+
+  if (!lastEncodedPolyline) {
+    alert("Route not ready yet.");
+    return;
+  }
+
+  // Generate static image
+  const imageUrl = await downloadStaticRouteImage(lastEncodedPolyline);
+
+  const imgRes = await fetch("/save_route_image/", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      image_url: imageUrl,
+      image_name: "route_1.png"
+    })
+  });
+
+  if (!imgRes.ok) {
+    alert("Failed to save route image.");
+    return;
+  }
+
+  const imgData = await imgRes.json();
+
+  // Send everything to backend
+  send_route_to_db(routeName, imgData.image_path);
+  }
+
+  async function send_route_to_db(routeName: string, imagePath: string) {
+    const routeData = {
+      distance: totalDistance,
+      elevation: elevation,
+      route_name: routeName,
+      coord_string: lastEncodedPolyline,
+      image_name: imagePath
+    };
+
+    const message = await fetch("http://127.0.0.1:5000/add_route/", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(routeData),
+    });
+
+    if (!message.ok) {
+      const err = await message.text();
+      throw new Error(`Flask error: ${err}`);
     }
 
-    routeFinalized = true;
-
-    // Calculate route one final time
-    calculateRoute(true);
+    console.log(message)
   }
 
   function handleEraseClick(event: MouseEvent): void {
     console.log('Erase Button was clicked!');
-      
+
+    routeFinalized = false;
+
     markers.forEach(marker => {
       marker.map = null;
     });
     markers = [];
 
-    
+
     routePolyline.setPath([]);
   }
 });
@@ -62,17 +124,17 @@ function initMap(): void {
 }
 
 async function fetchApiKey(): Promise<string | null> {
-    try {
-        const response = await fetch(`${apiUrl}/get-google-api-key`);
-        if (!response.ok) {
-            throw new Error(`HTTP error! status: ${response.status}`);
-        }
-        const data = await response.json();
-        return data.apiKey;
-    } catch (error) {
-        console.error('Error fetching API key:', error);
-        return null;
+  try {
+    const response = await fetch(`${apiUrl}/get-google-api-key`);
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
     }
+    const data = await response.json();
+    return data.apiKey;
+  } catch (error) {
+    console.error('Error fetching API key:', error);
+    return null;
+  }
 }
 
 function addMarker(location: google.maps.LatLng): void {
@@ -92,7 +154,7 @@ function addMarker(location: google.maps.LatLng): void {
 async function calculateRoute(fitAndCapture = false): Promise<void> {
   if (markers.length < 2) return;
 
- function toRoutesLatLng(position: google.maps.LatLng | google.maps.LatLngLiteral) {
+  function toRoutesLatLng(position: google.maps.LatLng | google.maps.LatLngLiteral) {
     if ('lat' in position && typeof position.lat === 'function') {
       // It's a LatLng object
       return { latLng: { latitude: position.lat, longitude: position.lng } };
@@ -116,12 +178,12 @@ async function calculateRoute(fitAndCapture = false): Promise<void> {
     computeAlternativeRoutes: false
   };
 
-   const googleApiKey = await fetchApiKey();
+  const googleApiKey = await fetchApiKey();
 
   try {
     const res = await fetch("https://routes.googleapis.com/directions/v2:computeRoutes", {
       method: "POST",
-      headers: { "Content-Type": "application/json", "X-Goog-Api-Key": googleApiKey, "X-Goog-FieldMask": "routes.distanceMeters,routes.duration,routes.polyline.encodedPolyline"},
+      headers: { "Content-Type": "application/json", "X-Goog-Api-Key": googleApiKey, "X-Goog-FieldMask": "routes.distanceMeters,routes.duration,routes.polyline.encodedPolyline" },
       body: JSON.stringify(body)
     });
 
@@ -133,6 +195,7 @@ async function calculateRoute(fitAndCapture = false): Promise<void> {
     }
 
     const route = data.routes[0];
+    lastEncodedPolyline = route.polyline.encodedPolyline;
 
     // Draw polyline using geometry.polyline
     if (!route.polyline || !route.polyline.encodedPolyline) {
@@ -143,41 +206,18 @@ async function calculateRoute(fitAndCapture = false): Promise<void> {
     const decodedPath = google.maps.geometry.encoding.decodePath(route.polyline.encodedPolyline);
     routePolyline.setPath(decodedPath);
 
-    if (fitAndCapture) {
-      const bounds = new google.maps.LatLngBounds();
-      decodedPath.forEach(p=> bounds.extend(p));
-      map.fitBounds(bounds);
-      downloadStaticRouteImage(route.polyline.encodedPolyline);
-    }
-
-    const elevation = getRouteElevation(decodedPath);
+    elevation = await getRouteElevation(decodedPath);
 
 
     // Total distance
-    let totalDistance = 0;
     totalDistance = route.distanceMeters;
-    alert("Total distance: " + (totalDistance / 1000).toFixed(2) + " km");
+    // alert("Total distance: " + (totalDistance / 1000).toFixed(2) + " km");
 
-    // const routeData = {
-    // distance: totalDistance,
-    // elevation: elevation,
-    // route_name: "",
-    // coord_string: "",
-    // image_name: ""
-    // }
-
-    // const message = await fetch("http://localhost:5000/api/routes", {
-    //   method: "POST",
-    //   headers: {
-    //     "Content-Type": "application/json",
-    //   },
-    //   body: JSON.stringify(route),
-    // });
-
-    // if (!res.ok) {
-    //   const err = await res.text();
-    //   throw new Error(`Flask error: ${err}`);
-    // }
+    if (fitAndCapture) {
+      const bounds = new google.maps.LatLngBounds();
+      decodedPath.forEach(p => bounds.extend(p));
+      map.fitBounds(bounds);
+    }
 
   } catch (err) {
     console.error("Routes API error:", err);
@@ -185,46 +225,43 @@ async function calculateRoute(fitAndCapture = false): Promise<void> {
 
 }
 
-function getRouteElevation(path: google.maps.LatLng[]): void {
-  elevationService.getElevationAlongPath(
-    {
-      path,
-      samples: 256,
-    },
-    (results, status) => {
-      if (status !== google.maps.ElevationStatus.OK || !results) {
-        console.error("Elevation service failed:", status);
-        return;
+function getRouteElevation(path: google.maps.LatLng[]): Promise<number> {
+  return new Promise((resolve, reject) => {
+    elevationService.getElevationAlongPath(
+      { path, samples: 256 },
+      (results, status) => {
+        if (status !== google.maps.ElevationStatus.OK || !results) {
+          reject(status);
+          return;
+        }
+
+        let totalGain = 0;
+        for (let i = 1; i < results.length; i++) {
+          const diff = results[i].elevation - results[i - 1].elevation;
+          if (diff > 0) totalGain += diff;
+        }
+
+        resolve(totalGain);
       }
-
-      let totalGain = 0;
-
-      for (let i = 1; i < results.length; i++) {
-        const diff = results[i].elevation - results[i - 1].elevation;
-        totalGain += diff;
-      }
-
-      // console.log("Elevation samples:", results);
-      console.log("Elevation gain (m):", totalGain.toFixed(1));
-
-      alert(
-        `Elevation gain: ${totalGain.toFixed(1)} m`
-      );
-
-      return totalGain;
-    }
-  );
+    );
+  });
 }
 
-function downloadStaticRouteImage(encodedPolyline: string): void {
-  const url =
-    `https://maps.googleapis.com/maps/api/staticmap` +
-    `?size=1200x800` +
-    `&path=weight:5|color:0x4285F4|enc:${encodedPolyline}` +
-    `&key=YOUR_API_KEY`; // or fetch from backend
+async function downloadStaticRouteImage(encodedPolyline: string): Promise<string> {
+  const googleApiKey = await fetchApiKey();
 
-  const link = document.createElement("a");
-  link.href = url;
-  link.download = "route.png";
-  link.click();
+  const start = markers[0].position as google.maps.LatLngLiteral;
+  const end = markers[markers.length - 1].position as google.maps.LatLngLiteral;
+
+  const safePolyline = encodeURIComponent(encodedPolyline);
+
+  const url =
+    "https://maps.googleapis.com/maps/api/staticmap" +
+    `?size=1200x800&scale=2` +
+    `&markers=color:green|label:S|${start.lat},${start.lng}` +
+    `&markers=color:red|label:E|${end.lat},${end.lng}` +
+    `&path=weight:6|color:0x1A4ED8|enc:${safePolyline}` +
+    `&key=${googleApiKey}`;
+
+  return url;
 }

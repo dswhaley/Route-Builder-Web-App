@@ -1,6 +1,6 @@
 from typing import Sequence, Tuple
 from sqlalchemy import Row, Select
-from flask import  render_template, redirect, request, url_for, current_app, jsonify
+from flask import  render_template, redirect, request, url_for, current_app, jsonify, abort
 from flask_login import login_required, current_user
 from flask import redirect, url_for, render_template, flash
 from app.auth.models import User, UserSchema
@@ -11,6 +11,7 @@ from app.core.forms import ActivityForm
 from app.auth.models import User
 from app.core.models import Activity, UserRoutes, Route, Type, RouteSchema
 import os
+import requests
 from dotenv import load_dotenv
 
 from .models import ActivitySchema
@@ -53,48 +54,48 @@ def get_activites_json5():
     schema = ActivitySchema()
     return jsonify(schema.dump(home_activities, many=True))
 
-@bp.post("/create_activity/")
-@login_required
-def add_activity():
-    form = ActivityForm()
+# @bp.post("/create_activity/")
+# @login_required
+# def add_activity():
+#     form = ActivityForm()
 
-    # Load user’s routes (must be repeated for POST)
-    user_route_links = UserRoutes.query.filter_by(uid=current_user.id).all()
-    user_route_ids = [ur.rid for ur in user_route_links]
-    routes = Route.query.filter(Route.rid.in_(user_route_ids)).all()
+#     # Load user’s routes (must be repeated for POST)
+#     user_route_links = UserRoutes.query.filter_by(uid=current_user.id).all()
+#     user_route_ids = [ur.rid for ur in user_route_links]
+#     routes = Route.query.filter(Route.rid.in_(user_route_ids)).all()
 
-    form.route.choices = [('', '-- None --')] + [(str(r.rid), r.route_name) for r in routes]  # type: ignore[assignment]
-    if form.validate_on_submit():
-        title = form.title.data
-        type = Type[form.type.data]
-        start_time = form.start_time.data
-        duration_minutes = form.duration_minutes.data
+#     form.route.choices = [('', '-- None --')] + [(str(r.rid), r.route_name) for r in routes]  # type: ignore[assignment]
+#     if form.validate_on_submit():
+#         title = form.title.data
+#         type = Type[form.type.data]
+#         start_time = form.start_time.data
+#         duration_minutes = form.duration_minutes.data
 
-        #no route selected
-        if not form.route.data:
-            if not form.distance.data:
-                flash("Please enter a distance or select a route.")
-                return redirect(url_for('core.add_activity_form'))
-            distance_val = form.distance.data
-            route_id = None
+#         #no route selected
+#         if not form.route.data:
+#             if not form.distance.data:
+#                 flash("Please enter a distance or select a route.")
+#                 return redirect(url_for('core.add_activity_form'))
+#             distance_val = form.distance.data
+#             route_id = None
 
-        else:
-            selected_route = Route.query.get(int(form.route.data))
-            distance_val = selected_route.distance  # type: ignore[call-arg]
-            route_id = selected_route.rid           # type: ignore[call-arg]
+#         else:
+#             selected_route = Route.query.get(int(form.route.data))
+#             distance_val = selected_route.distance  # type: ignore[call-arg]
+#             route_id = selected_route.rid           # type: ignore[call-arg]
 
-        activity = Activity(user_id=current_user.id, title=title, type=type, start_time=start_time, duration_minute=duration_minutes, distance=distance_val, route_id=route_id) # type: ignore[call-arg]
-        db.session.add(activity)
-        db.session.commit()
+#         activity = Activity(user_id=current_user.id, title=title, type=type, start_time=start_time, duration_minute=duration_minutes, distance=distance_val, route_id=route_id) # type: ignore[call-arg]
+#         db.session.add(activity)
+#         db.session.commit()
 
-        for i in get_activities_by_date():
-            print(f"{i.title}: By User: {i.user.username} for {i.duration_minute} mins")
-    else:
-        for field,error_msg in form.errors.items():
-            flash(f"{field}: {error_msg}")
-            return redirect(url_for('core.add_activity_form'))
+#         for i in get_activities_by_date():
+#             print(f"{i.title}: By User: {i.user.username} for {i.duration_minute} mins")
+#     else:
+#         for field,error_msg in form.errors.items():
+#             flash(f"{field}: {error_msg}")
+#             return redirect(url_for('core.add_activity_form'))
 
-    return redirect(url_for('core.go_home'))
+#     return redirect(url_for('core.go_home'))
 
 
 @bp.get("/profile/")
@@ -123,19 +124,84 @@ def create_route():
     google_key = os.getenv("GOOGLE_MAPS_API_KEY")
     return render_template('create_route.html', GOOGLE_MAPS_API_KEY=google_key, user=current_user)
 
-@bp.route("/routes")
+@bp.post("/add_route/")
 @login_required
 def add_route_to_db():
     response = request.json
+
+    print("ROUTE HIT")   # ← MUST appear in terminal
+    print(request.json)
         
-    route = Route(distance=response.distance, elevation=response.elevation, route_name=response.route_name, coord_string=response.coord_string, image_name=response.image_name) # type: ignore[call-arg]
+    route = Route(
+        distance=response["distance"], #type: ignore
+        elevation=response["elevation"], #type: ignore
+        route_name=response["route_name"], #type: ignore
+        coord_string=response["coord_string"], #type: ignore
+        image_name=response["image_name"], #type: ignore
+    )
     db.session.add(route)
     db.session.commit()
 
     return ""
-    
+
+@bp.post('/create_activity')#type: ignore 
+def post_activity():
+    data = request.json #type: ignore
+
+    if data is None or not isinstance(data, dict):
+            return abort(400)
+
+    activity_args = {
+        'user_id': data['user_id'],
+        'title': data['title'],
+        'start_time': data['start_time'],
+        'duration': data['duration'],
+        'distance': data['distance']
+    }
+
+    if data.get('route_id') and data.get('route_id') != '0':
+        activity_args['route_id'] = data['route_id']
+
+    activity = Activity(**activity_args)
+
+    db.session.add(activity)
+    db.session.commit()
+
+    schema = ActivitySchema()
+    return schema.dump(activity, many=False), 201
 
 
+@bp.post("/save_route_image/")
+@login_required
+def save_route_image():
+    data = request.get_json()
+
+    image_url = data.get("image_url")
+    image_name = data.get("image_name", "route.png")
+
+    if not image_url:
+        return jsonify({"error": "Missing image_url"}), 400
+
+    # app/static/route_images
+    save_dir = os.path.join(current_app.root_path, "static", "route_images")
+    os.makedirs(save_dir, exist_ok=True)
+
+    image_path = os.path.join(save_dir, image_name)
+
+    try:
+        resp = requests.get(image_url, timeout=10)
+        resp.raise_for_status()
+
+        with open(image_path, "wb") as f:
+            f.write(resp.content)
+
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+    return jsonify({
+        "ok": True,
+        "image_path": f"/static/route_images/{image_name}"
+    }), 201
 
 
 
@@ -147,6 +213,14 @@ def get_routes():
     routes = [row[0] for row in rows]
     schema = RouteSchema()
     return jsonify(schema.dump(routes, many=True))
+
+@bp.get("/routes_json/<int:rid>")
+def get_route_json(rid):
+    query = db.select(Route).where(Route.rid == rid)
+    rows = db.session.execute(query).all()
+    route = [row[0] for row in rows]
+    schema = RouteSchema()
+    return jsonify(schema.dump(route[0], many=False))
 
 
 @bp.post('/user_json/<int:uid>')
