@@ -17,7 +17,7 @@ document.addEventListener("DOMContentLoaded", () => {
   eraseBtn.addEventListener('click', handleEraseClick);
 
 
-  function handleCreateClick(event: MouseEvent): Promise<void> {
+  async function handleCreateClick(event: MouseEvent): Promise<void> {
   event.preventDefault();
 
   if (markers.length < 2) {
@@ -27,9 +27,30 @@ document.addEventListener("DOMContentLoaded", () => {
 
   routeFinalized = true;
 
-  // Generate static image
-  downloadStaticRouteImage(lastEncodedPolyline);
+  if (!lastEncodedPolyline) {
+    alert("Route not ready yet.");
+    return;
+  }
 
+  // Generate static image
+  const imageUrl = await downloadStaticRouteImage(lastEncodedPolyline);
+
+  const imgRes = await fetch("/save_route_image/", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      image_url: imageUrl,
+      image_name: "route_1.png"
+    })
+  });
+
+  if (!imgRes.ok) {
+    alert("Failed to save route image.");
+    return;
+  }
+
+  const imgData = await imgRes.json();
+  
   // Send everything to backend
   send_route_to_db();
 }
@@ -216,30 +237,21 @@ function getRouteElevation(path: google.maps.LatLng[]): Promise<number> {
   });
 }
 
-async function downloadStaticRouteImage(encodedPolyline: string): Promise<void> {
+async function downloadStaticRouteImage(encodedPolyline: string): Promise<string> {
   const googleApiKey = await fetchApiKey();
 
   const start = markers[0].position as google.maps.LatLngLiteral;
   const end = markers[markers.length - 1].position as google.maps.LatLngLiteral;
 
-  const baseUrl = "https://maps.googleapis.com/maps/api/staticmap";
+  const safePolyline = encodeURIComponent(encodedPolyline);
 
-  const params = [
-    "size=1200x800",
+  const url =
+    "https://maps.googleapis.com/maps/api/staticmap" +
+    `?size=1200x800&scale=2` +
+    `&markers=color:green|label:S|${start.lat},${start.lng}` +
+    `&markers=color:red|label:E|${end.lat},${end.lng}` +
+    `&path=weight:6|color:0x1A4ED8|enc:${safePolyline}` +
+    `&key=${googleApiKey}`;
 
-    `markers=color:green|label:S|${start.lat},${start.lng}`,
-    
-    `markers=color:red|label:E|${end.lat},${end.lng}`,
-
-    `path=weight:5|color:0x0033AA|enc:${encodedPolyline}`,
-
-    `key=${googleApiKey}`
-  ];
-
-  const url = `${baseUrl}?${params.join("&")}`;
-
-  const link = document.createElement("a");
-  link.href = url;
-  link.download = "route.png";
-  link.click();
+  return url;
 }

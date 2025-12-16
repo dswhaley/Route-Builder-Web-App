@@ -11,6 +11,7 @@ from app.core.forms import ActivityForm
 from app.auth.models import User
 from app.core.models import Activity, UserRoutes, Route, Type, RouteSchema
 import os
+import requests
 from dotenv import load_dotenv
 
 from .models import ActivitySchema
@@ -143,7 +144,37 @@ def add_route_to_db():
     return jsonify({"ok": True}), 201
     
 
+@bp.post("/save_route_image/")
+@login_required
+def save_route_image():
+    data = request.get_json()
 
+    image_url = data.get("image_url")
+    image_name = data.get("image_name", "route.png")
+
+    if not image_url:
+        return jsonify({"error": "Missing image_url"}), 400
+
+    # app/static/route_images
+    save_dir = os.path.join(current_app.root_path, "static", "route_images")
+    os.makedirs(save_dir, exist_ok=True)
+
+    image_path = os.path.join(save_dir, image_name)
+
+    try:
+        resp = requests.get(image_url, timeout=10)
+        resp.raise_for_status()
+
+        with open(image_path, "wb") as f:
+            f.write(resp.content)
+
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+    return jsonify({
+        "ok": True,
+        "image_path": f"/static/route_images/{image_name}"
+    }), 201
 
 
 

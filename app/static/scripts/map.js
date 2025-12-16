@@ -12,14 +12,31 @@ document.addEventListener("DOMContentLoaded", () => {
     createBtn.addEventListener('click', handleCreateClick);
     const eraseBtn = document.getElementById('eraseBtn');
     eraseBtn.addEventListener('click', handleEraseClick);
-    function handleCreateClick(event) {
+    async function handleCreateClick(event) {
         event.preventDefault();
         if (markers.length < 2) {
             alert("Add at least two points first.");
             return;
         }
         routeFinalized = true;
-        downloadStaticRouteImage(lastEncodedPolyline);
+        if (!lastEncodedPolyline) {
+            alert("Route not ready yet.");
+            return;
+        }
+        const imageUrl = await downloadStaticRouteImage(lastEncodedPolyline);
+        const imgRes = await fetch("/save_route_image/", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+                image_url: imageUrl,
+                image_name: "route_1.png"
+            })
+        });
+        if (!imgRes.ok) {
+            alert("Failed to save route image.");
+            return;
+        }
+        const imgData = await imgRes.json();
         send_route_to_db();
     }
     async function send_route_to_db() {
@@ -168,17 +185,12 @@ async function downloadStaticRouteImage(encodedPolyline) {
     const googleApiKey = await fetchApiKey();
     const start = markers[0].position;
     const end = markers[markers.length - 1].position;
-    const baseUrl = "https://maps.googleapis.com/maps/api/staticmap";
-    const params = [
-        "size=1200x800",
-        `markers=color:green|label:S|${start.lat},${start.lng}`,
-        `markers=color:red|label:E|${end.lat},${end.lng}`,
-        `path=weight:5|color:0x0033AA|enc:${encodedPolyline}`,
-        `key=${googleApiKey}`
-    ];
-    const url = `${baseUrl}?${params.join("&")}`;
-    const link = document.createElement("a");
-    link.href = url;
-    link.download = "route.png";
-    link.click();
+    const safePolyline = encodeURIComponent(encodedPolyline);
+    const url = "https://maps.googleapis.com/maps/api/staticmap" +
+        `?size=1200x800&scale=2` +
+        `&markers=color:green|label:S|${start.lat},${start.lng}` +
+        `&markers=color:red|label:E|${end.lat},${end.lng}` +
+        `&path=weight:6|color:0x1A4ED8|enc:${safePolyline}` +
+        `&key=${googleApiKey}`;
+    return url;
 }
