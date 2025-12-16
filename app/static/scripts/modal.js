@@ -161,11 +161,12 @@ async function handleRouteSelection(event) {
     else {
         const routeResponse = await fetch(`/routes_json/${routeId}`);
         const route = await validateJSON(routeResponse);
-        const routeDistance = route.distance;
-        console.log(`Route Distance: ${routeDistance}`);
+        const routeDistanceMeters = route.distance;
+        const routeDistanceMiles = routeDistanceMeters / 1609.34;
+        console.log(`Route Distance: ${routeDistanceMiles}`);
         if (route) {
             distanceField.disabled = true;
-            distanceField.value = routeDistance.toString();
+            distanceField.value = routeDistanceMiles.toFixed(2);
         }
     }
 }
@@ -203,7 +204,7 @@ async function createActivity() {
         canPost = false;
     }
     const distanceElement = document.getElementById("distance");
-    const distance = durationElement.value;
+    const distance = distanceElement.value;
     if (!distance) {
         alert("Distance Required");
         canPost = false;
@@ -241,6 +242,7 @@ async function createActivity() {
         const activity = await validateJSON(response);
         alert("Activity was created");
         reloadActivities();
+        clearActivityForm();
     }
 }
 function reloadActivities() {

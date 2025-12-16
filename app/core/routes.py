@@ -4,7 +4,7 @@ from flask import  render_template, redirect, request, url_for, current_app, jso
 from flask_login import login_required, current_user
 from flask import redirect, url_for, render_template, flash
 from app.auth.models import User, UserSchema
-from datetime import datetime
+from datetime import UTC, datetime
 from app import db
 from app.core import bp
 from app.core.forms import ActivityForm
@@ -139,6 +139,7 @@ def add_route_to_db():
         coord_string=response["coord_string"], #type: ignore
         image_name=response["image_name"], #type: ignore
     )
+
     db.session.add(route)
     db.session.commit()
 
@@ -185,9 +186,23 @@ def post_activity():
     schema = ActivitySchema()
     return schema.dump(activity, many=False), 201
 
-@bp.get('/create_activity/')
-def get_activity():
-    return ''
+@bp.get('/get_activity/<int:activity_id>')
+def get_activity_json(activity_id: int):
+    activity: Activity = db.get_or_404(Activity, activity_id)
+    schema = ActivitySchema()
+    return jsonify({
+        'fetched': datetime.now(UTC).isoformat(),
+        'result': schema.dump(activity, many=False)
+    })
+
+# @bp.get('/get_route/<int:route_id>')
+# def get_route(route_id: int):
+#     route: Route = db.get_or_404(Route, route_id)
+#     schema = RouteSchema()
+#     return jsonify({
+#         'fetched': datetime.now(UTC).isoformat(),
+#         'result': schema.dump(route, many=False)
+#     })
 
 @bp.post("/save_route_image/")
 @login_required

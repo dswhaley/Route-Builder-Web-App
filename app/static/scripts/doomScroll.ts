@@ -27,7 +27,7 @@ export async function addMore(){
     for(const a of response){
         console.log("a");
         let n= document.createElement("div");
-        let d = helper(n, a);
+        let d = await helper(n, a);
         i.append(d);
     }
     
@@ -36,7 +36,7 @@ export async function addMore(){
     //update the page with the new div
 }
 
-function helper(n : HTMLDivElement, a: ActivityAPI.Activity){
+async function helper(n : HTMLDivElement, a: ActivityAPI.Activity){
     const id = document.getElementById("currentUser");
     const numId = Number(id.innerText);
     const admin = document.getElementById("isAdmin");
@@ -69,7 +69,10 @@ function helper(n : HTMLDivElement, a: ActivityAPI.Activity){
     y.appendChild(x);
     if(a.route_id != null){
     let e = document.createElement("img");
-    e.src = "/static/route_images/" + a.route_id + ".png";
+    const json = await fetch("/routes_json/"+a.route_id);
+    const result = await vJSON(json);
+    console.log(result);
+    e.src = "/static/route_images/" + result.image_name;
     e.alt = "Route-" + a.route_id + "-Map";
     e.classList.add("route-img");
     e.id = "routePic";
