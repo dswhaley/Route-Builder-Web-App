@@ -122,16 +122,25 @@ def create_route():
     google_key = os.getenv("GOOGLE_MAPS_API_KEY")
     return render_template('create_route.html', GOOGLE_MAPS_API_KEY=google_key, user=current_user)
 
-@bp.route("/routes")
+@bp.post("/add_route/")
 @login_required
 def add_route_to_db():
     response = request.json
+
+    print("ROUTE HIT")   # ← MUST appear in terminal
+    print(request.json)
         
-    route = Route(distance=response.distance, elevation=response.elevation, route_name=response.route_name, coord_string=response.coord_string, image_name=response.image_name) # type: ignore[call-arg]
+    route = Route(
+        distance=response["distance"], #type: ignore
+        elevation=response["elevation"], #type: ignore
+        route_name=response["route_name"], #type: ignore
+        coord_string=response["coord_string"], #type: ignore
+        image_name=response["image_name"], #type: ignore
+    )
     db.session.add(route)
     db.session.commit()
 
-    return ""
+    return jsonify({"ok": True}), 201
     
 
 

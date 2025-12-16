@@ -2,11 +2,13 @@ let map: google.maps.Map;
 let markers: google.maps.marker.AdvancedMarkerElement[] = [];
 let routePolyline: google.maps.Polyline;
 let elevationService: google.maps.ElevationService;
+let totalDistance: number;
+let elevation: number;
 
 const apiUrl = 'http://localhost:5000/api';
 
 document.addEventListener("DOMContentLoaded", () => {
-  
+
   const createBtn = document.getElementById('createBtn');
   createBtn.addEventListener('click', handleCreateClick);
   const eraseBtn = document.getElementById('eraseBtn');
@@ -15,23 +17,45 @@ document.addEventListener("DOMContentLoaded", () => {
 
   function handleCreateClick(event: MouseEvent): void {
     console.log('Button was clicked!');
-    const output = document.getElementById('outputArea');
-    if (output) {
-      output.textContent = 'Button clicked at ' + new Date().toLocaleTimeString();
+
+    send_route_to_db()
+
+  }
+
+  async function send_route_to_db() {
+    const routeData = {
+      distance: totalDistance,
+      elevation: elevation,
+      route_name: "TEST",
+      coord_string: "",
+      image_name: "1.png"
     }
-    // Optional: prevent default behavior if the button is part of a form
-    event.preventDefault();
+
+    const message = await fetch("http://127.0.0.1:5000/add_route/", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(routeData),
+    });
+
+    if (!message.ok) {
+      const err = await message.text();
+      throw new Error(`Flask error: ${err}`);
+    }
+
+    console.log(message)
   }
 
   function handleEraseClick(event: MouseEvent): void {
     console.log('Erase Button was clicked!');
-      
+
     markers.forEach(marker => {
       marker.map = null;
     });
     markers = [];
 
-    
+
     routePolyline.setPath([]);
   }
 });
@@ -57,17 +81,17 @@ function initMap(): void {
 }
 
 async function fetchApiKey(): Promise<string | null> {
-    try {
-        const response = await fetch(`${apiUrl}/get-google-api-key`);
-        if (!response.ok) {
-            throw new Error(`HTTP error! status: ${response.status}`);
-        }
-        const data = await response.json();
-        return data.apiKey;
-    } catch (error) {
-        console.error('Error fetching API key:', error);
-        return null;
+  try {
+    const response = await fetch(`${apiUrl}/get-google-api-key`);
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
     }
+    const data = await response.json();
+    return data.apiKey;
+  } catch (error) {
+    console.error('Error fetching API key:', error);
+    return null;
+  }
 }
 
 function addMarker(location: google.maps.LatLng): void {
@@ -85,7 +109,7 @@ function addMarker(location: google.maps.LatLng): void {
 async function calculateRoute(): Promise<void> {
   if (markers.length < 2) return;
 
- function toRoutesLatLng(position: google.maps.LatLng | google.maps.LatLngLiteral) {
+  function toRoutesLatLng(position: google.maps.LatLng | google.maps.LatLngLiteral) {
     if ('lat' in position && typeof position.lat === 'function') {
       // It's a LatLng object
       return { latLng: { latitude: position.lat, longitude: position.lng } };
@@ -109,12 +133,12 @@ async function calculateRoute(): Promise<void> {
     computeAlternativeRoutes: false
   };
 
-   const googleApiKey = await fetchApiKey();
+  const googleApiKey = await fetchApiKey();
 
   try {
     const res = await fetch("https://routes.googleapis.com/directions/v2:computeRoutes", {
       method: "POST",
-      headers: { "Content-Type": "application/json", "X-Goog-Api-Key": googleApiKey, "X-Goog-FieldMask": "routes.distanceMeters,routes.duration,routes.polyline.encodedPolyline"},
+      headers: { "Content-Type": "application/json", "X-Goog-Api-Key": googleApiKey, "X-Goog-FieldMask": "routes.distanceMeters,routes.duration,routes.polyline.encodedPolyline" },
       body: JSON.stringify(body)
     });
 
@@ -136,34 +160,12 @@ async function calculateRoute(): Promise<void> {
     const decodedPath = google.maps.geometry.encoding.decodePath(route.polyline.encodedPolyline);
     routePolyline.setPath(decodedPath);
 
-    const elevation = getRouteElevation(decodedPath);
+    elevation = await getRouteElevation(decodedPath);
 
 
     // Total distance
-    let totalDistance = 0;
     totalDistance = route.distanceMeters;
-    alert("Total distance: " + (totalDistance / 1000).toFixed(2) + " km");
-
-    // const routeData = {
-    // distance: totalDistance,
-    // elevation: elevation,
-    // route_name: "",
-    // coord_string: "",
-    // image_name: ""
-    // }
-
-    // const message = await fetch("http://localhost:5000/api/routes", {
-    //   method: "POST",
-    //   headers: {
-    //     "Content-Type": "application/json",
-    //   },
-    //   body: JSON.stringify(route),
-    // });
-
-    // if (!res.ok) {
-    //   const err = await res.text();
-    //   throw new Error(`Flask error: ${err}`);
-    // }
+    // alert("Total distance: " + (totalDistance / 1000).toFixed(2) + " km");
 
   } catch (err) {
     console.error("Routes API error:", err);
@@ -171,33 +173,24 @@ async function calculateRoute(): Promise<void> {
 
 }
 
-function getRouteElevation(path: google.maps.LatLng[]): void {
-  elevationService.getElevationAlongPath(
-    {
-      path,
-      samples: 256,
-    },
-    (results, status) => {
-      if (status !== google.maps.ElevationStatus.OK || !results) {
-        console.error("Elevation service failed:", status);
-        return;
+function getRouteElevation(path: google.maps.LatLng[]): Promise<number> {
+  return new Promise((resolve, reject) => {
+    elevationService.getElevationAlongPath(
+      { path, samples: 256 },
+      (results, status) => {
+        if (status !== google.maps.ElevationStatus.OK || !results) {
+          reject(status);
+          return;
+        }
+
+        let totalGain = 0;
+        for (let i = 1; i < results.length; i++) {
+          const diff = results[i].elevation - results[i - 1].elevation;
+          if (diff > 0) totalGain += diff;
+        }
+
+        resolve(totalGain);
       }
-
-      let totalGain = 0;
-
-      for (let i = 1; i < results.length; i++) {
-        const diff = results[i].elevation - results[i - 1].elevation;
-        totalGain += diff;
-      }
-
-      // console.log("Elevation samples:", results);
-      console.log("Elevation gain (m):", totalGain.toFixed(1));
-
-      alert(
-        `Elevation gain: ${totalGain.toFixed(1)} m`
-      );
-
-      return totalGain;
-    }
-  );
+    );
+  });
 }

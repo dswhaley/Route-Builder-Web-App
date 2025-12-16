@@ -2,6 +2,8 @@ let map;
 let markers = [];
 let routePolyline;
 let elevationService;
+let totalDistance;
+let elevation;
 const apiUrl = 'http://localhost:5000/api';
 document.addEventListener("DOMContentLoaded", () => {
     const createBtn = document.getElementById('createBtn');
@@ -10,11 +12,28 @@ document.addEventListener("DOMContentLoaded", () => {
     eraseBtn.addEventListener('click', handleEraseClick);
     function handleCreateClick(event) {
         console.log('Button was clicked!');
-        const output = document.getElementById('outputArea');
-        if (output) {
-            output.textContent = 'Button clicked at ' + new Date().toLocaleTimeString();
+        do_the_thing();
+    }
+    async function do_the_thing() {
+        const routeData = {
+            distance: totalDistance,
+            elevation: elevation,
+            route_name: "TEST",
+            coord_string: "",
+            image_name: ""
+        };
+        const message = await fetch("http://127.0.0.1:5000/add_route/", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify(routeData),
+        });
+        if (!message.ok) {
+            const err = await message.text();
+            throw new Error(`Flask error: ${err}`);
         }
-        event.preventDefault();
+        console.log(message);
     }
     function handleEraseClick(event) {
         console.log('Erase Button was clicked!');
@@ -105,31 +124,27 @@ async function calculateRoute() {
         }
         const decodedPath = google.maps.geometry.encoding.decodePath(route.polyline.encodedPolyline);
         routePolyline.setPath(decodedPath);
-        const elevation = getRouteElevation(decodedPath);
-        let totalDistance = 0;
+        elevation = await getRouteElevation(decodedPath);
         totalDistance = route.distanceMeters;
-        alert("Total distance: " + (totalDistance / 1000).toFixed(2) + " km");
     }
     catch (err) {
         console.error("Routes API error:", err);
     }
 }
 function getRouteElevation(path) {
-    elevationService.getElevationAlongPath({
-        path,
-        samples: 256,
-    }, (results, status) => {
-        if (status !== google.maps.ElevationStatus.OK || !results) {
-            console.error("Elevation service failed:", status);
-            return;
-        }
-        let totalGain = 0;
-        for (let i = 1; i < results.length; i++) {
-            const diff = results[i].elevation - results[i - 1].elevation;
-            totalGain += diff;
-        }
-        console.log("Elevation gain (m):", totalGain.toFixed(1));
-        alert(`Elevation gain: ${totalGain.toFixed(1)} m`);
-        return totalGain;
+    return new Promise((resolve, reject) => {
+        elevationService.getElevationAlongPath({ path, samples: 256 }, (results, status) => {
+            if (status !== google.maps.ElevationStatus.OK || !results) {
+                reject(status);
+                return;
+            }
+            let totalGain = 0;
+            for (let i = 1; i < results.length; i++) {
+                const diff = results[i].elevation - results[i - 1].elevation;
+                if (diff > 0)
+                    totalGain += diff;
+            }
+            resolve(totalGain);
+        });
     });
 }
