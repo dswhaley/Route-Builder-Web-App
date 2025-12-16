@@ -1,7 +1,9 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title> Home</title>
+    <title>Home</title>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/css/bootstrap.min.css" 
     rel="stylesheet" crossorigin="anonymous"
     integrity="sha384-4bw+/aepP/YC94hEpVNVgiZdgIC5+VKNBQNGCHeKRQN+PtmoHDEXuppvnDJzQIu9">
@@ -26,7 +28,7 @@
     Add Activity
 </a>
   <a href="/create_route/">Create Route</a>
-   <a id = "logout" href = "/auth/logout/"> Logout </a>
+   <a id = "logout" href = "/auth/logout/">Logout</a>
    <a href="javascript:void(0);" class="icon" onclick="resize()">
     <i class="fa fa-bars" aria-hidden="true"></i>
     </a>
@@ -38,35 +40,17 @@
         <option> Everyone's Activities</option>
     </select> -->
 </div>
+<div hidden id = "currentUser"> {{user.id}}
+ </div>
 
-
+ <div hidden id = "isAdmin"> {% if user.admin %} 1 {%else%}
+0 {%endif%} </div>
 <!-- Page content -->
 
 <div class = "box" id = "box">
 <div class = "row align-items-center justify-content-left" id = "row">
-<!--         
-        {%for activity in activities%}
-        <div class= "col-sm-12 col-md-6 col-lg-6 col-xl-4">
-        <div class = "cardEx" id = "card1">
-    <div class="card text-center">
-       
-        <div class="card-header">
-         {{activity.title}}
-        </div>
-        <div class="card-body">
-          <h1 class="card-title"> {{activity.distance}}mi, {{activity.duration_minute}}min</h1>
-          {%if activity.route%}
-            <img src="{{ url_for('static', filename='route_images/' ~ activity.route.image_name) }}" alt="Route-Map" class="route-img" id = "routePic">
-        {%endif%}
-        <button onclick="deleteActivity('{{activity.aid}}')">Delete Activity</button>   
-        </div>
-        </div>
-        </div>
-        </div>
-        
-    {%endfor%}
-        </div>
-        </div> -->
+  </div>
+   </div>
 
   <div class="modal fade" id="formModal" tabindex="-1" aria-labelledby="formModalLabel" aria-modal="true" role="dialog">
       <div class="modal-dialog">
@@ -107,6 +91,6 @@
               </div>
           </div>
       </div>
-  </div>
+
 </body>
 </html>
