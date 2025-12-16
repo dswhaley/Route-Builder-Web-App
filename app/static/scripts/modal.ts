@@ -69,12 +69,13 @@ async function handleRouteSelection(event: Event){
         const routeResponse =  await fetch(`/routes_json/${routeId}`);
         const route = <RouteManager.Route> await validateJSON(routeResponse);
 
-        const routeDistance = route.distance;
+        const routeDistanceMeters = route.distance;
+        const routeDistanceMiles = routeDistanceMeters / 1609.34;
 
-        console.log(`Route Distance: ${routeDistance}`);
+        console.log(`Route Distance: ${routeDistanceMiles}`);
         if (route){
             distanceField.disabled = true; 
-            distanceField.value = routeDistance.toString();
+            distanceField.value = routeDistanceMiles.toFixed(2);
         }
     }
 }
