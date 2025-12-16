@@ -120,7 +120,7 @@ def go_home():
 @login_required
 def create_route():
     google_key = os.getenv("GOOGLE_MAPS_API_KEY")
-    return render_template('create_route.html', GOOGLE_MAPS_API_KEY=google_key)
+    return render_template('create_route.html', GOOGLE_MAPS_API_KEY=google_key, user=current_user)
 
 @bp.route("/routes")
 @login_required
