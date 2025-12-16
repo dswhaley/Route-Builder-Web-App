@@ -1,7 +1,8 @@
 .topnav {
   background-color:rgb(9, 1, 103);
   overflow: hidden;
-  
+  font-family: 'Times New Roman', Times, serif;
+
 }
 
 /* Style the links inside the navigation bar */
