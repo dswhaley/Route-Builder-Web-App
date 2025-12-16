@@ -1,9 +1,15 @@
+declare const html2canvas: (
+  element: HTMLElement,
+  options?: any
+) => Promise<HTMLCanvasElement>;
+
 let map: google.maps.Map;
 let markers: google.maps.marker.AdvancedMarkerElement[] = [];
 let routePolyline: google.maps.Polyline;
 let elevationService: google.maps.ElevationService;
 let totalDistance: number;
 let elevation: number;
+let routeFinalized = false;
 
 const apiUrl = 'http://localhost:5000/api';
 
@@ -95,6 +101,8 @@ async function fetchApiKey(): Promise<string | null> {
 }
 
 function addMarker(location: google.maps.LatLng): void {
+  if (routeFinalized) return;
+
   // Create custom marker element
   const marker = new google.maps.marker.AdvancedMarkerElement({
     position: location,
@@ -106,7 +114,7 @@ function addMarker(location: google.maps.LatLng): void {
   if (markers.length >= 2) calculateRoute();
 }
 
-async function calculateRoute(): Promise<void> {
+async function calculateRoute(fitAndCapture = false): Promise<void> {
   if (markers.length < 2) return;
 
   function toRoutesLatLng(position: google.maps.LatLng | google.maps.LatLngLiteral) {

@@ -76,6 +76,8 @@ async function fetchApiKey() {
     }
 }
 function addMarker(location) {
+    if (routeFinalized)
+        return;
     const marker = new google.maps.marker.AdvancedMarkerElement({
         position: location,
         map: map,
@@ -84,7 +86,7 @@ function addMarker(location) {
     if (markers.length >= 2)
         calculateRoute();
 }
-async function calculateRoute() {
+async function calculateRoute(fitAndCapture = false) {
     if (markers.length < 2)
         return;
     function toRoutesLatLng(position) {
