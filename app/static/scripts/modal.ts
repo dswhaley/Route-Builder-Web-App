@@ -167,6 +167,7 @@ async function createActivity(){
 
         alert("Activity was created")
         reloadActivities();
+        clearActivityForm();
 
     }   
 
