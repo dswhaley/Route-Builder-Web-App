@@ -1,5 +1,4 @@
 namespace ActivityAPI{
-export let currentActivity: Activity;
 export interface Activity {
     aid: number;
     description?: string;
@@ -12,19 +11,9 @@ export interface Activity {
     user_id: number;
     username: string;
 }
-
 }
 document.addEventListener("DOMContentLoaded", async () => {
-    // find the button and add an event listener
-    console.log("begining");
-    addMore();
-    // const btn: HTMLButtonElement = <HTMLButtonElement> document.getElementById("loadMore");
-    // btn.addEventListener("click", addMore);
-    //check with Daniel abt integrating the delete button
-    // const btn: HTMLButtonElement = <HTMLButtonElement> document.getElementById();
-    // btn.addEventListener("click", {deleteActivity()});
-    
-    
+    addMore();    
 });
 
 async function addMore(){

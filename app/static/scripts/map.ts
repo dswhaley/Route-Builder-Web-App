@@ -1,8 +1,3 @@
-declare const html2canvas: (
-  element: HTMLElement,
-  options?: any
-) => Promise<HTMLCanvasElement>;
-
 let map: google.maps.Map;
 let markers: google.maps.marker.AdvancedMarkerElement[] = [];
 let routePolyline: google.maps.Polyline;
